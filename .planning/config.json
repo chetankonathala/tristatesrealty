@@ -1,0 +1,8 @@
+{
+  "workflow": {
+    "skip_discuss": false,
+    "use_worktrees": false,
+    "commit_docs": false
+  },
+  "model_profile": "quality"
+}
