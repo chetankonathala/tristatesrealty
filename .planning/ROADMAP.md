@@ -9,7 +9,7 @@
 
 | Phase | Name | Status | Plans | Requirements |
 |-------|------|--------|-------|--------------|
-| 1 | Foundation & Design System | Pending | 0/0 | INFRA-01–06, DS-01–05 |
+| 1 | Foundation & Design System | Planning | 0/8 | INFRA-01–06, DS-01–05 |
 | 2 | IDX Listings Engine | Pending | 0/0 | IDX-01–10 |
 | 3 | Schell Brothers Communities | Pending | 0/0 | SCHELL-01–07 |
 | 4 | Buyer Accounts & AI Recommendations | Pending | 0/0 | BUYER-01–08 |
@@ -26,24 +26,38 @@
 
 ### Phase 1: Foundation & Design System
 
-**Goal:** Fully configured Next.js 15 project with luxury dark design system, deployed to Vercel on tristatesrealty.com, with all infrastructure wired up.
+**Goal:** Fully configured Next.js 16 project with luxury dark design system, deployed to Vercel on tristatesrealty.com, with all infrastructure wired up.
 
 **Why first:** Everything else builds on top of this. Getting the design system right here means every subsequent phase inherits pixel-perfect components automatically.
 
+**Plans:** 8 plans
+
+Plans:
+- [ ] 01-PLAN-01.md — Project initialization (Next.js 16, TypeScript, Tailwind v4, fonts, env setup)
+- [ ] 01-PLAN-02.md — Supabase + Clerk integration (pgvector, auth middleware, sign-in/up pages)
+- [ ] 01-PLAN-03.md — Design tokens + shadcn/ui (OKLCH palette, @theme inline, 11 base primitives)
+- [ ] 01-PLAN-04.md — Layout components (Navbar with scroll transition, Footer, MobileMenu)
+- [ ] 01-PLAN-05.md — UI primitives (Button 5 variants, Badge, Input, Select, FilterPill, Skeleton, Toast)
+- [ ] 01-PLAN-06.md — Cards + Map + Modal + Framer Motion wrappers (ListingCard, CommunityCard, MapContainer, animations)
+- [ ] 01-PLAN-07.md — Homepage shell (Hero, Featured Listings, Communities, CTA Banner, full assembly)
+- [ ] 01-PLAN-08.md — Vercel deployment + domain + AWS Lambda skeleton
+
 **Success Criteria:**
-- [ ] Next.js 15 App Router + TypeScript + Tailwind + Supabase + Clerk running locally and on Vercel
+- [ ] Next.js 16 App Router + TypeScript + Tailwind v4 + Supabase + Clerk running locally and on Vercel
 - [ ] tristatesrealty.com resolves to the deployed app
-- [ ] Design system: black/gold/white palette, Playfair Display + Montserrat, component library documented in Storybook
-- [ ] Homepage shell renders with hero, nav, footer — matches luxury aesthetic
+- [ ] Design system: black/gold/white OKLCH palette, Playfair Display + Montserrat, shadcn/ui components
+- [ ] Homepage shell renders with hero, nav, footer — matches luxury aesthetic from UI-SPEC
 - [ ] Lighthouse score > 90 on homepage
-- [ ] AWS Lambda background job environment configured
+- [ ] AWS Lambda background job environment configured (skeleton)
 
 **Key Decisions:**
-- Next.js 15 App Router (ISR for listing pages, RSC for performance)
+- Next.js 16 App Router (ISR for listing pages, RSC for performance) — updated from v15 per research
+- Tailwind v4 CSS-first configuration (no tailwind.config.js)
 - Supabase (PostgreSQL + pgvector — single DB for listings, users, vectors, market data)
-- Clerk (buyer + agent auth with role separation)
+- Clerk (buyer + agent auth with role separation via publicMetadata.role)
 - Mapbox GL for maps (better customization than Google Maps for dark theme)
-- Resend for transactional email, Twilio for SMS
+- Framer Motion v12 for animations
+- shadcn/ui with OKLCH tokens for component primitives
 
 ---
 
@@ -228,4 +242,4 @@
 
 ---
 *Roadmap created: 2026-04-06*
-*Last updated: 2026-04-06 after initial project definition*
+*Last updated: 2026-04-06 — Phase 1 planned (8 plans in 5 waves)*
