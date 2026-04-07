@@ -9,7 +9,7 @@
 
 | Phase | Name | Status | Plans | Requirements |
 |-------|------|--------|-------|--------------|
-| 1 | Foundation & Design System | Planning | 0/8 | INFRA-01–06, DS-01–05 |
+| 1 | Foundation & Design System | 1/8 | In Progress|  |
 | 2 | IDX Listings Engine | Pending | 0/0 | IDX-01–10 |
 | 3 | Schell Brothers Communities | Pending | 0/0 | SCHELL-01–07 |
 | 4 | Buyer Accounts & AI Recommendations | Pending | 0/0 | BUYER-01–08 |
@@ -30,7 +30,7 @@
 
 **Why first:** Everything else builds on top of this. Getting the design system right here means every subsequent phase inherits pixel-perfect components automatically.
 
-**Plans:** 8 plans
+**Plans:** 1/8 plans executed
 
 Plans:
 - [ ] 01-PLAN-01.md — Project initialization (Next.js 16, TypeScript, Tailwind v4, fonts, env setup)
