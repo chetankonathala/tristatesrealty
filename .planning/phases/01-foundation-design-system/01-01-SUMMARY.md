@@ -95,7 +95,7 @@ Each task was committed atomically:
 1. **Task 1: Create Next.js 16 project and install all Phase 1 dependencies** - `e040956` (feat)
 2. **Task 2: Configure fonts, root layout, and environment variables** - `8049593` (feat)
 
-**Plan metadata:** (to be added in final commit)
+**Plan metadata:** `1f572c2` (docs: complete plan)
 
 ## Files Created/Modified
 - `src/lib/fonts.ts` - Playfair Display + Montserrat next/font/google declarations with CSS variable exports
