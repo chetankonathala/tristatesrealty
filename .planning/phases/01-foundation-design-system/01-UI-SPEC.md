@@ -21,8 +21,8 @@ created: 2026-04-06
 | Preset | Custom dark luxury preset (configured during `npx shadcn@latest init`) |
 | Component library | Radix UI (via shadcn) |
 | Icon library | Lucide React |
-| Font (headings) | Playfair Display (Google Fonts, weights: 700) |
-| Font (body) | Montserrat (Google Fonts, weights: 400, 600) |
+| Font (headings) | Playfair Display (Google Fonts, weight: 700) |
+| Font (body) | Montserrat (Google Fonts, weights: 400, 700) |
 | Animation library | Framer Motion v11 |
 | CSS framework | Tailwind CSS v4 (dark-first, no toggle) |
 
@@ -60,8 +60,8 @@ Declared values (multiples of 4 only):
 | xl | 32px | Layout gaps between components, section padding on tablet |
 | 2xl | 48px | Major section breaks, hero content padding |
 | 3xl | 64px | Page-level vertical rhythm between homepage sections |
-| 4xl | 96px | Hero section vertical padding on desktop |
-| 5xl | 128px | Maximum hero breathing room on large viewports |
+| 4xl | 96px | Hero section vertical padding on desktop (hero-exclusive, not for component-level spacing) |
+| 5xl | 128px | Maximum hero breathing room on large viewports (hero-exclusive, not for component-level spacing) |
 
 Exceptions:
 - Touch targets: minimum 44px height/width for all interactive elements (WCAG 2.5.8)
@@ -72,16 +72,18 @@ Exceptions:
 
 ## Typography
 
+Exactly 4 font sizes, exactly 2 font weights.
+
 | Role | Font | Size | Weight | Line Height | Letter Spacing |
 |------|------|------|--------|-------------|----------------|
-| Display | Playfair Display | 48px (desktop) / 32px (mobile) | 700 | 1.1 | -0.02em |
-| Heading 1 | Playfair Display | 36px (desktop) / 28px (mobile) | 700 | 1.2 | -0.01em |
-| Heading 2 | Playfair Display | 28px (desktop) / 24px (mobile) | 700 | 1.2 | 0 |
-| Heading 3 | Montserrat | 20px | 600 | 1.3 | 0.01em |
+| Display / H1 | Playfair Display | 48px (desktop) / 32px (mobile) | 700 | 1.1 | -0.02em |
+| Heading | Playfair Display | 28px (desktop) / 24px (mobile) | 700 | 1.2 | 0 |
 | Body | Montserrat | 16px | 400 | 1.6 | 0.01em |
-| Body Small | Montserrat | 14px | 400 | 1.5 | 0.01em |
-| Label / Caption | Montserrat | 12px | 600 | 1.4 | 0.05em (uppercase) |
-| Button | Montserrat | 14px | 600 | 1.0 | 0.04em (uppercase for primary CTAs) |
+| Label / Caption | Montserrat | 12px | 400 | 1.4 | 0.05em (uppercase) |
+
+**Tertiary headings:** For cases where a third-level heading is needed (e.g., card titles, sidebar headings), use Body size (16px) at weight 700 with uppercase and 0.04em letter-spacing. This does not introduce a new size token.
+
+**Button text:** Uses Body size (16px) at weight 700, uppercase with 0.04em letter-spacing.
 
 **Font loading strategy:** Use `next/font/google` with `display: 'swap'` for both Playfair Display and Montserrat. Preload both weights to prevent layout shift (DS-05: CLS < 0.1).
 
@@ -150,7 +152,7 @@ Per REQUIREMENTS.md DS-03, these components must be built or configured:
 |-----------|----------|-------|
 | `Navbar` | desktop (sticky, transparent-to-solid on scroll), mobile (hamburger + slide-over) | Logo left, nav links center, CTA right. Background: transparent at top, `--card` with backdrop-blur after 80px scroll. Height: 72px desktop, 64px mobile. |
 | `MobileMenu` | open / closed | Full-height slide-over from right. Background: `--background` at 98% opacity with backdrop-blur. Close on overlay click or X button. |
-| `NavLink` | default, active, hover | Montserrat 14px weight 600 uppercase. Active: gold underline 2px. Hover: gold underline fade-in 200ms. |
+| `NavLink` | default, active, hover | Montserrat 16px weight 700 uppercase, letter-spacing 0.04em. Active: gold underline 2px. Hover: gold underline fade-in 200ms. |
 
 ### Footer
 
@@ -162,7 +164,7 @@ Per REQUIREMENTS.md DS-03, these components must be built or configured:
 
 | Component | Variants | Notes |
 |-----------|----------|-------|
-| `Button` | primary, secondary, ghost, outline, destructive, icon-only | Primary: gold background (#C9A84C), dark text (#0A0A0A), weight 600, uppercase 14px, letter-spacing 0.04em. Hover: `--accent-hover`. Height: 44px (touch target). Padding: 16px 24px. Border-radius: 4px (sharp luxury feel, not rounded). |
+| `Button` | primary, secondary, ghost, outline, destructive, icon-only | Primary: gold background (#C9A84C), dark text (#0A0A0A), weight 700, uppercase 16px, letter-spacing 0.04em. Hover: `--accent-hover`. Height: 44px (touch target). Padding: 16px 24px. Border-radius: 4px (sharp luxury feel, not rounded). |
 | | | Secondary: transparent background, 1px `--border`, `--foreground` text. Hover: `--muted` background. |
 | | | Ghost: no border, no background. Text: `--muted-foreground`. Hover: `--muted` background, text `--foreground`. |
 | | | Outline: 1px `--accent` border, `--accent` text. Hover: `--accent` background, dark text. |
@@ -171,7 +173,7 @@ Per REQUIREMENTS.md DS-03, these components must be built or configured:
 
 | Component | Variants | Notes |
 |-----------|----------|-------|
-| `ListingCard` | default, featured, compact (list view) | Background: `--card`. Border: 1px `--border`. Border-radius: 8px. Hover: border `--border-hover`, subtle y-translate -2px with 200ms ease. Image aspect ratio: 4:3. Price in gold accent. Beds/baths/sqft in `--muted-foreground` 14px. |
+| `ListingCard` | default, featured, compact (list view) | Background: `--card`. Border: 1px `--border`. Border-radius: 8px. Hover: border `--border-hover`, subtle y-translate -2px with 200ms ease. Image aspect ratio: 4:3. Price in gold accent. Beds/baths/sqft in `--muted-foreground` 12px uppercase. |
 | `CommunityCard` | default | Similar to ListingCard but with community name overlay on hero image. Gradient overlay: linear-gradient(transparent 40%, rgba(10,10,10,0.9) 100%). |
 
 ### Form Elements
@@ -199,7 +201,7 @@ Per REQUIREMENTS.md DS-03, these components must be built or configured:
 
 | Component | Variants | Notes |
 |-----------|----------|-------|
-| `Badge` | default, featured, new, status | Small: 12px uppercase Montserrat 600. Background: `--accent-muted` for featured/new, `--muted` for default. Height: 24px. Border-radius: 4px. |
+| `Badge` | default, featured, new, status | 12px uppercase Montserrat weight 700. Background: `--accent-muted` for featured/new, `--muted` for default. Height: 24px. Border-radius: 4px. |
 | `Skeleton` | text, image, card | Background: `--muted`. Shimmer animation: linear-gradient sweep from `--muted` to `--border` to `--muted` over 1.5s infinite. |
 | `Divider` | horizontal, vertical | 1px `--border`. |
 | `Toast` | success, error, info | Bottom-right positioned. Background: `--card`. Left border: 3px accent color matching type. Auto-dismiss: 5s. |
@@ -235,17 +237,17 @@ These are Tailwind v4 defaults. Do not customize breakpoints.
 ### Homepage Shell Layout (Phase 1 deliverable)
 
 ```
-[Navbar — sticky, transparent → solid on scroll]
+[Navbar — sticky, transparent -> solid on scroll]
 [Hero — full viewport height, background image, overlay gradient]
   - Display heading: "Find Your Dream Home"
   - Subheading: body text, max-width 560px
   - Primary CTA button
   - Optional: search bar preview (non-functional in Phase 1, visual only)
 [Featured Listings Section — 3xl top padding]
-  - Section heading (H2)
+  - Section heading (Heading 28px)
   - 3-column grid of ListingCard (placeholder data in Phase 1)
 [Communities Section — 3xl top padding]
-  - Section heading (H2)
+  - Section heading (Heading 28px)
   - CommunityCard grid (placeholder data in Phase 1)
 [CTA Banner — full bleed, accent-muted background]
   - Heading + body + CTA button
@@ -318,7 +320,7 @@ No destructive actions exist in Phase 1 (no delete, no account removal). Destruc
 | INP | < 200ms | No blocking JS in critical path. Use React Server Components for static sections. Defer Mapbox GL load. |
 | Total JS bundle (initial) | < 150KB gzipped | Tree-shake Lucide icons. Lazy-load Framer Motion for below-fold sections. Code-split modal and sheet components. |
 | Largest image (hero) | < 200KB | Serve hero as WebP at 1920px max-width, quality 80. Use `next/image` blur placeholder. |
-| Font files | < 100KB total | Subset Playfair Display (Latin only, weight 700). Subset Montserrat (Latin only, weights 400 + 600). |
+| Font files | < 100KB total | Subset Playfair Display (Latin only, weight 700). Subset Montserrat (Latin only, weights 400 + 700). |
 | Lighthouse score | > 90 | Measured on deployed Vercel URL, mobile throttled profile. |
 
 ---
