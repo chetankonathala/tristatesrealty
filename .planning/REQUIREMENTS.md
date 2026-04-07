@@ -8,8 +8,8 @@
 ### Foundation & Infrastructure
 
 - [x] **INFRA-01**: Next.js 15 App Router project initialized with TypeScript, Tailwind CSS, and ESLint
-- [ ] **INFRA-02**: Supabase project configured (PostgreSQL + pgvector extension enabled)
-- [ ] **INFRA-03**: Clerk authentication integrated for buyer accounts and agent admin
+- [x] **INFRA-02**: Supabase project configured (PostgreSQL + pgvector extension enabled)
+- [x] **INFRA-03**: Clerk authentication integrated for buyer accounts and agent admin
 - [ ] **INFRA-04**: Vercel deployment configured with custom domain (tristatesrealty.com)
 - [ ] **INFRA-05**: AWS Lambda configured for background jobs (embedding generation, data polling)
 - [x] **INFRA-06**: Environment configuration for all third-party API keys
