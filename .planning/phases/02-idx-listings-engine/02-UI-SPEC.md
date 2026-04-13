@@ -96,7 +96,17 @@ Tabular-nums (`font-variant-numeric: tabular-nums`) is required for all prices, 
 
 ## Color
 
-Inherited from Phase 1. No new palette tokens.
+Inherited from Phase 1. No new palette tokens except `--warning` (see note below).
+
+**60 / 30 / 10 split — re-confirmed for Phase 2 (unchanged from Phase 1):**
+
+| Ratio | Role | Token | Phase 2 Surfaces |
+|-------|------|-------|------------------|
+| 60% | Dominant surface | `--background` (near-black `#0A0A0A`) | Search page body, listing detail page body, map container background, filter sheet background on mobile |
+| 30% | Secondary surface | `--card` / `--muted` (`#141414` / `#1C1C1C`) | Filter sidebar, listing cards, detail spec grid cells, comparable sales cards, MLS attribution strip, modals, popovers, lightbox chrome |
+| 10% | Accent | `--accent` (gold `#C9A84C`) | Reserved-for list below — price, selected filter, map pin, saved heart, etc. |
+
+The Phase 2 ratio is identical to Phase 1. No surface in Phase 2 changes the dominant/secondary balance.
 
 **Phase 2 specific accent usage (extends the Phase 1 reserved list):**
 
@@ -122,14 +132,14 @@ Gold accent must NOT be used in Phase 2 for:
 | State | Token | Usage in Phase 2 |
 |-------|-------|------------------|
 | Listing status: Active | `--success` #16A34A | small dot indicator on card corner |
-| Listing status: Pending | #F59E0B (warning — new, used only for pending badges) | badge background with dark text |
+| Listing status: Pending | `--warning` #F59E0B (new token — see note below) | badge background with dark text |
 | Listing status: Sold / Closed | `--muted-foreground` | desaturated badge |
 | Price reduced indicator | `--destructive` #DC2626 | down-arrow icon + "Price reduced" label |
 | Saved (favorited) | `--accent` #C9A84C | filled heart |
 | Unsaved | `--muted-foreground` | outlined heart |
 | Search area on map | `--accent` at 15% opacity | polygon fill, 2px `--accent` stroke |
 
-**Pending status warning color exception:** The Phase 1 palette has no "warning" token. Adding `--warning: #F59E0B` is the ONLY new CSS variable this phase introduces. Rationale: "Pending" is a legally-distinct MLS status that must be visually differentiated from Active (green) and Closed (gray), and reusing gold would conflict with the reserved-for list.
+**Pending status warning color exception:** The Phase 1 palette has no "warning" token. Adding `--warning: #F59E0B` is the ONLY new CSS variable this phase introduces. Rationale: "Pending" is a legally-distinct MLS status that must be visually differentiated from Active (green) and Closed (gray), and reusing gold would conflict with the reserved-for list. `--warning` is NOT counted toward the 10% accent budget — it is a status-only token used on compact badges (under ~2% of pixel area).
 
 ---
 
@@ -147,7 +157,7 @@ Gold accent must NOT be used in Phase 2 for:
 | `PropertyTypeChips` | multi-select | Chip row (wraps). "House / Condo / Townhouse / Multi-Family / Land / New Construction". Multi-select with checkmark icon when selected. |
 | `LocationSearch` | default, with-suggestions | Autocomplete input. Mapbox Geocoding API for city/zip/county suggestions. Dropdown: `--card` with 1px `--border`, 8px radius, shadow. Hover row: `--muted`. Selected: `--accent-muted`. |
 | `SearchResultsHeader` | default | "1,248 homes in Delaware" (Body 16px weight 700) + sort dropdown right-aligned. Sort options: Newest, Price ↓, Price ↑, Beds, Sqft. |
-| `ViewToggle` | map-active, list-active, split-active | Segmented control top-right of results. Icons: `Map`, `List`, `Columns`. Active indicator: gold underline 2px. Desktop defaults to split. Mobile defaults to list (with "Map" toggle button). |
+| `ViewToggle` | map-active, list-active, split-active | Segmented control top-right of results. Icons + text labels pairing: Lucide `Map` + "Map", Lucide `List` + "List", Lucide `Columns` + "Split". Text labels ALWAYS accompany icons on desktop (lg+); on mobile (<lg) the control collapses to icon-only with `aria-label="Map view"`, `aria-label="List view"`, `aria-label="Split view"` fallbacks. Active indicator: gold underline 2px. Desktop defaults to split. Mobile defaults to list (with "Map" toggle button). |
 | `ListingCard` (compact) | default, saved, featured, price-reduced | Extends Phase 1 `ListingCard`. 4:3 image with photo counter pill bottom-left ("1 / 24"). Status dot top-right. Heart button top-right (overlays image). Price, address, meta row. Max 2-line address with ellipsis. |
 | `ListingCardSkeleton` | default | Same dimensions as card. Shimmer image block + 3 text bars. |
 | `SearchMap` | full, split, hidden | react-map-gl container. Dark-v11 style. Clustered markers via supercluster (render cluster circles with count). Single markers: gold pin. Selected: accent-hover + pulse. Popup on click: ListingCard compact variant inside Mapbox popup. |
@@ -165,7 +175,7 @@ Gold accent must NOT be used in Phase 2 for:
 |-----------|----------|----------|
 | `ListingGallery` | desktop (5-photo collage), mobile (carousel), lightbox | Desktop: 1 large (60%) + 4 small grid. "View all N photos" CTA bottom-right over last thumbnail. Mobile: horizontal swipeable carousel with photo counter pill. Lightbox: full-screen shadcn `Dialog`, dark overlay, photo + prev/next arrows + counter + close X. |
 | `ListingHero` | default | Below gallery. Left: price (Display 48px), address (Heading 28px), beds/baths/sqft strip. Right: action buttons (Save, Share, Contact Agent, Schedule Tour). On mobile stacks vertically. Sticky contact button bar at bottom on mobile. |
-| `ListingActionRow` | default | Horizontal button group: Save (outline + heart), Share (ghost + share icon), Print (ghost + printer icon), Contact Agent (primary). 44px height. |
+| `ListingActionRow` | default | Horizontal button group: Save Home (outline + heart), Share Listing (ghost + share icon), Print (ghost + printer icon), Contact Agent (primary). 44px height. |
 | `ListingSpecGrid` | default | 2-column grid on mobile, 4-column on desktop. Each cell: label (12px uppercase muted) above value (16px weight 700). Fields: MLS #, Lot Size, Year Built, Property Type, Days on Market, HOA, Garage, Heating. |
 | `ListingDescription` | default, expanded | Body 16px line-height 1.6. Truncated at 8 lines with fade-to-background gradient. "Read more" text link below expands. |
 | `ListingFeaturesList` | default | Two-column bullet grid on desktop (single column mobile). Check icon (Lucide `Check` 16px in accent) before each feature. Grouped by category: Interior, Exterior, Community. |
@@ -297,6 +307,8 @@ All animations use Framer Motion v12. `prefers-reduced-motion` disables all.
 | Error state CTA | "Try Again" |
 | Loading state | "Searching the Tri States..." |
 | Map attribution | "Map data (C) Mapbox (C) OpenStreetMap" (Mapbox default — do not remove) |
+| ViewToggle labels (desktop) | "Map", "List", "Split" |
+| ViewToggle aria-labels (mobile icon-only) | "Map view", "List view", "Split view" |
 
 ### Listing Card
 
@@ -317,8 +329,8 @@ All animations use Framer Motion v12. `prefers-reduced-motion` disables all.
 | Element | Copy |
 |---------|------|
 | Price label (a11y only) | "Listed price" |
-| Save button | "Save" / "Saved" |
-| Share button | "Share" |
+| Save button | "Save Home" / "Home Saved" |
+| Share button | "Share Listing" |
 | Contact agent button (primary) | "Contact Agent" |
 | Schedule tour button | "Schedule a Tour" |
 | Description heading | "About This Home" |
@@ -372,7 +384,7 @@ All animations use Framer Motion v12. `prefers-reduced-motion` disables all.
 
 | Action | Pattern |
 |--------|---------|
-| Delete saved search | Confirmation dialog. Heading: "Delete saved search?" Body: "You'll stop receiving alerts for '{name}'. This cannot be undone." Cancel (ghost) + "Delete" (destructive variant). |
+| Delete saved search | Confirmation dialog. Heading: "Delete saved search?" Body: "You'll stop receiving alerts for '{name}'. This cannot be undone." "Keep Search" (ghost) + "Delete Search" (destructive variant). |
 | Unsave a home | No confirmation (one-tap undo). Heart toggles to unfilled immediately. Toast: "Removed from saved homes · Undo" (undo ghost link, toast auto-dismiss 5s per Phase 1 contract). |
 | Clear all filters | No confirmation. Filters clear immediately. Toast: "Filters cleared". |
 
@@ -388,6 +400,7 @@ Inherits Phase 1 base contract. Phase 2 additions:
 | Marker accessibility | Each marker has `aria-label="{price} home at {address}, {beds} bed {baths} bath {sqft} sqft"`. Cluster: `aria-label="Cluster of {count} homes, press Enter to zoom in"`. |
 | Lightbox | Focus trap when open. Escape closes. Left/Right arrows navigate. Close button has `aria-label="Close photo viewer"`. Image `alt` = "{address} photo {n} of {total}". |
 | Filter controls | All sliders, selects, and chips are keyboard operable. Range slider announces value on change via `aria-valuetext`. |
+| ViewToggle | Desktop (lg+) renders icon + visible text label pair. Mobile (<lg) collapses to icon-only buttons, each with `aria-label` matching the desktop text ("Map view", "List view", "Split view"). Active state announced via `aria-pressed="true"`. |
 | Saved-search alerts | Email must pass WebAIM contrast checks on dark background. Plain-text alternative required (Resend multipart). |
 | Street View iframe | `<iframe title="Google Street View of {address}">`. Loading skeleton has `aria-busy="true"`. |
 | JSON-LD | Must NOT duplicate visible content in an accessible way that creates screen-reader noise. Use `<Script type="application/ld+json">` (Next.js `<Script>` strategy="afterInteractive"). |
