@@ -1,0 +1,17 @@
+{
+  "name": "tristates-background-jobs",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "package": "tsc && zip -j function.zip dist/handler.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.102.0",
+    "openai": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0",
+    "typescript": "^5.0.0"
+  }
+}

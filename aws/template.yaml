@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Tri States Realty Background Jobs
+
+Globals:
+  Function:
+    Timeout: 300
+    Runtime: nodejs20.x
+    MemorySize: 512
+
+Resources:
+  BackgroundJobsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: tristates-background-jobs
+      Handler: handler.handler
+      CodeUri: lambda/dist/
+      Environment:
+        Variables:
+          SUPABASE_URL: !Ref SupabaseUrl
+          SUPABASE_SERVICE_ROLE_KEY: !Ref SupabaseServiceRoleKey
+          OPENAI_API_KEY: !Ref OpenAIApiKey
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+Parameters:
+  SupabaseUrl:
+    Type: String
+    Description: Supabase project URL
+  SupabaseServiceRoleKey:
+    Type: String
+    Description: Supabase service role key
+    NoEcho: true
+  OpenAIApiKey:
+    Type: String
+    Description: OpenAI API key for embeddings
+    NoEcho: true
+
+Outputs:
+  FunctionArn:
+    Description: Lambda function ARN
+    Value: !GetAtt BackgroundJobsFunction.Arn
