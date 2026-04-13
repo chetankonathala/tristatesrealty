@@ -1,7 +1,14 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { motion, useReducedMotion, type Transition } from "framer-motion"
 import { Button } from "@/components/ui/button"
+import { HeroParticles } from "./hero-particles"
+
+const MapBackground = dynamic(
+  () => import("@/components/map/map-container").then((m) => m.MapContainer),
+  { ssr: false, loading: () => <div className="absolute inset-0 bg-background" /> }
+)
 
 export function HeroSection() {
   const reduced = useReducedMotion()
@@ -14,16 +21,25 @@ export function HeroSection() {
 
   return (
     <section className="relative min-h-screen overflow-hidden flex items-center justify-center">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-card/50 to-background" />
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background" />
 
-      {/* Content */}
-      <div
-        className="relative z-10 mx-auto max-w-[560px] px-4 text-center"
-        style={{ willChange: "transform, opacity" }}
-      >
+      {/* Layer 1: Mapbox interactive map background */}
+      <div className="absolute inset-0 z-0">
+        <MapBackground
+          variant="full-page"
+          center={[-75.8, 39.2]}
+          zoom={6.5}
+          className="!rounded-none h-full"
+        />
+      </div>
+
+      {/* Layer 2: Gradient overlay — keeps text readable */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-b from-background/60 via-background/50 to-background/90" />
+
+      {/* Layer 3: Gold particle constellation */}
+      <HeroParticles />
+
+      {/* Layer 4: Hero content */}
+      <div className="relative z-30 mx-auto max-w-[560px] px-4 text-center">
         <motion.h1
           {...item(0)}
           className="font-display text-[32px] md:text-5xl lg:text-6xl font-bold text-foreground leading-tight"
