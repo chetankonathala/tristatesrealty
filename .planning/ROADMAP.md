@@ -10,7 +10,7 @@
 | Phase | Name | Status | Plans | Requirements |
 |-------|------|--------|-------|--------------|
 | 1 | Foundation & Design System | 2/8 | In Progress|  |
-| 2 | IDX Listings Engine | Pending | 0/0 | IDX-01–10 |
+| 2 | IDX Listings Engine | Planned | 0/11 | IDX-01–10 |
 | 3 | Schell Brothers Communities | Pending | 0/0 | SCHELL-01–07 |
 | 4 | Buyer Accounts & AI Recommendations | Pending | 0/0 | BUYER-01–08 |
 | 5 | Market Analytics & Valuation Tool | Pending | 0/0 | MKT-01–05 |
@@ -68,6 +68,21 @@ Plans:
 **Why second:** Listings are the core product. Everything else (AI, offers, analytics) depends on listings existing and being searchable.
 
 **Prerequisites:** Schell Brothers broker IDX authorization from Bright MLS. IDX Broker Platinum account.
+
+**Plans:** 11 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Foundation: deps, env vars, listings schema migration + push, Listing types, MLS constants
+- [ ] 02-02-PLAN.md — SimplyRETS client + transform + sync job + cron-protected /api/listings/sync route
+- [ ] 02-03-PLAN.md — Zod searchParams schema + searchListings/getListingByMlsId/getComparableSales queries
+- [ ] 02-04-PLAN.md — Filter primitives + SearchFilters (desktop sticky bar + Dialog + mobile Sheet) + ActiveFilterBar + ViewToggle + ResultsHeader (D-05/06/07/08)
+- [ ] 02-05-PLAN.md — SearchMap with supercluster + dark-v11 + search-as-you-move + extended ListingCard with Save heart + skeleton
+- [ ] 02-06-PLAN.md — /listings RSC page + loading + error + NuqsAdapter in layout + SearchResultsGrid (D-01 split, D-03 mobile)
+- [ ] 02-07-PLAN.md — Listing detail components: gallery (D-09), hero (D-11), spec grid, description (D-10), features list, mobile sticky bar, action row
+- [ ] 02-08-PLAN.md — PriceHistoryTable, StreetViewEmbed, LocationMap, ComparableSalesGrid, MlsAttribution (IDX-09), ListingJsonLd (IDX-07)
+- [ ] 02-09-PLAN.md — saved_searches table + RLS + CRUD API (Clerk-auth + IDOR-safe) + SignInRequiredModal + SavedSearchButton (D-14)
+- [ ] 02-10-PLAN.md — Resend email template + Twilio SMS + match logic with 4 D-13 triggers + cron notify route + vercel.json crons (D-15)
+- [ ] 02-11-PLAN.md — /listings/[mlsId] route (RSC + ISR + generateStaticParams) + opengraph-image.tsx + Phase 2 UAT checkpoint
 
 **Success Criteria:**
 - [ ] SimplyRETS API pulling live Bright MLS data, syncing every 15 minutes
