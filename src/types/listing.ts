@@ -1,0 +1,74 @@
+export type ListingStatus = "Active" | "Pending" | "ActiveUnderContract" | "ComingSoon" | "Closed";
+export type PropertyType = "residential" | "condominium" | "townhouse" | "land" | "multifamily" | "commercial";
+
+export interface Listing {
+  id: number;
+  mls_id: number;
+  listing_id: string | null;
+  list_price: number;
+  list_date: string | null;
+  modified: string | null;
+  status: ListingStatus;
+  type: PropertyType | null;
+  subtype: string | null;
+  address_full: string;
+  address_street: string | null;
+  address_city: string;
+  address_state: string;
+  address_postal_code: string | null;
+  address_county: string | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  area: number | null;
+  lot_size: number | null;
+  year_built: number | null;
+  stories: number | null;
+  garage_spaces: number | null;
+  pool: string | null;
+  lat: number | null;
+  lng: number | null;
+  geo_market_area: string | null;
+  remarks: string | null;
+  photos: string[];
+  virtual_tour_url: string | null;
+  listing_agent_name: string | null;
+  listing_agent_phone: string | null;
+  listing_agent_email: string | null;
+  listing_office_name: string | null;
+  listing_office_phone: string | null;
+  co_agent_name: string | null;
+  days_on_market: number | null;
+  school_district: string | null;
+  school_elementary: string | null;
+  school_middle: string | null;
+  school_high: string | null;
+  tax_annual_amount: number | null;
+  hoa_fee: number | null;
+  hoa_frequency: string | null;
+  features: string[];
+  waterfront: boolean;
+  new_construction: boolean;
+  open_house_date: string | null;
+  raw_data: unknown | null;
+  synced_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ListingSummary {
+  mls_id: number;
+  list_price: number;
+  status: ListingStatus;
+  address_full: string;
+  address_city: string;
+  address_state: string;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  area: number | null;
+  photos: string[];
+  lat: number | null;
+  lng: number | null;
+  list_date: string | null;
+  days_on_market: number | null;
+  open_house_date: string | null;
+}
