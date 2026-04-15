@@ -30,8 +30,13 @@ export async function generateStaticParams() {
   // Pre-render the top 500 most-recent active listings at build time.
   // Misses fall through to ISR (dynamicParams=true).
   // getTopListingsForStaticParams already returns `{ mlsId: string }[]` (plan 02-03).
-  const top = await getTopListingsForStaticParams(500);
-  return top.map((row) => ({ mlsId: row.mlsId }));
+  // Gracefully return [] if Supabase is unreachable at build time (CI / local without creds).
+  try {
+    const top = await getTopListingsForStaticParams(500);
+    return top.map((row) => ({ mlsId: row.mlsId }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

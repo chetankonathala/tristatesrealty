@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createBuildClient } from "@/lib/supabase/build";
 import type { Listing, ListingSummary } from "@/types/listing";
 import type { SearchParams } from "@/lib/schemas/search-params";
 import { parseBounds, parseMultiValue } from "@/lib/schemas/search-params";
@@ -128,7 +129,9 @@ export async function getListingByMlsId(mlsId: string | number): Promise<Listing
 }
 
 export async function getTopListingsForStaticParams(limit = 500): Promise<{ mlsId: string }[]> {
-  const supabase = await createClient();
+  // Uses the build-time client (no cookies) because generateStaticParams runs
+  // at build time without an HTTP request context.
+  const supabase = createBuildClient();
   const { data, error } = await supabase
     .from("listings")
     .select("mls_id")
