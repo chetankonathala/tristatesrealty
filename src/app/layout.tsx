@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { playfairDisplay, montserrat } from "@/lib/fonts";
 import "./globals.css";
 import { Geist } from "next/font/google";
@@ -19,12 +20,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={cn("dark", playfairDisplay.variable, montserrat.variable, "font-sans", geist.variable)}>
       <body className="bg-background text-foreground font-body antialiased">
         <ClerkProvider>
-          <Navbar />
-          <main id="main-content">
-            {children}
-          </main>
-          <Footer />
-          <ToastProvider />
+          <NuqsAdapter>
+            <Navbar />
+            <main id="main-content">
+              {children}
+            </main>
+            <Footer />
+            <ToastProvider />
+          </NuqsAdapter>
         </ClerkProvider>
       </body>
     </html>
