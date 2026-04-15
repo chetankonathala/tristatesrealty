@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="Equal Housing Opportunity">
+  <rect width="80" height="80" fill="#0A0A0A"/>
+  <path d="M40 12 L66 32 V64 H14 V32 Z" fill="none" stroke="#F5F5F0" stroke-width="2"/>
+  <text x="40" y="56" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#F5F5F0" font-weight="bold">EQUAL</text>
+  <text x="40" y="68" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="7" fill="#F5F5F0">HOUSING</text>
+  <text x="40" y="76" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="7" fill="#F5F5F0">OPPORTUNITY</text>
+</svg>
