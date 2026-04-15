@@ -13,6 +13,7 @@ export interface SavedSearch {
   is_active: boolean;
   last_notified_at: string | null;
   last_seen_mls_ids: number[];
+  last_seen_prices: Record<string, number> | null;
   created_at: string;
   updated_at: string;
 }
