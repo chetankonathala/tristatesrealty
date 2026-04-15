@@ -7,6 +7,7 @@ import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Navbar, Footer } from "@/components/layout"
 import { ToastProvider } from "@/components/ui/toast-provider";
+import { SignInRequiredModal } from "@/components/listings/sign-in-required-modal";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </main>
             <Footer />
             <ToastProvider />
+            <SignInRequiredModal />
           </NuqsAdapter>
         </ClerkProvider>
       </body>
