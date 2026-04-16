@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const revalidateTag: (...args: any[]) => void = require("next/cache").revalidateTag;
+import { revalidateTag } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 import { fetchDelawareCommunities, fetchFloorPlans } from "./client";
 import { transformFloorPlan } from "./transform";
@@ -95,9 +94,9 @@ export async function syncSchellListings(): Promise<SchellSyncResult> {
 
   // 4. Trigger ISR revalidation
   try {
-    revalidateTag("listings");
+    revalidateTag("listings", {});
     for (const id of activeMlsIds.slice(0, 100)) {
-      revalidateTag(`listing-${id}`);
+      revalidateTag(`listing-${id}`, {});
     }
   } catch {
     // Not critical if revalidation fails mid-sync
