@@ -40,30 +40,37 @@ export function HeroSection() {
 
       {/* Layer 4: Hero content */}
       <div className="relative z-30 mx-auto max-w-[560px] px-4 text-center">
-        <motion.h1
+        <motion.p
           {...item(0)}
+          className="font-body text-xs uppercase tracking-[0.2em] text-accent mb-3"
+        >
+          Schell Brothers · Delaware
+        </motion.p>
+
+        <motion.h1
+          {...item(0.05)}
           className="font-display text-[32px] md:text-5xl lg:text-6xl font-bold text-foreground leading-tight"
         >
-          Find Your Dream Home
+          Find Your Dream Home in Delaware
         </motion.h1>
 
         <motion.p
           {...item(0.15)}
           className="mt-4 font-body text-base text-muted-foreground max-w-lg mx-auto"
         >
-          Discover luxury properties across Delaware, Maryland, New Jersey, and Pennsylvania.
+          Browse new construction communities by Schell Brothers — Delaware&apos;s premier home builder. Connect with a licensed agent to get started.
         </motion.p>
 
         <motion.div
           {...item(0.3)}
           className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <Button variant="default" size="lg">
-            Explore Properties
-          </Button>
-          <Button variant="secondary" size="lg">
-            Get a Home Valuation
-          </Button>
+          <a href="/listings" className="inline-flex items-center justify-center rounded-md bg-accent px-6 py-3 text-base font-semibold text-background hover:bg-accent/90 transition-colors">
+            Explore Communities
+          </a>
+          <a href="/listings?newConstruction=true" className="inline-flex items-center justify-center rounded-md border border-border bg-card/60 px-6 py-3 text-base font-semibold text-foreground hover:bg-card transition-colors">
+            View Available Homes
+          </a>
         </motion.div>
       </div>
     </section>

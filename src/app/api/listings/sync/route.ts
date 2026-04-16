@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { syncListings } from "@/lib/simplyrets/sync";
+import { syncSchellListings } from "@/lib/schell/sync";
 
 export const runtime = "nodejs";
-export const maxDuration = 300; // 5 min
+export const maxDuration = 300; // 5 min — scraping ~20 communities takes ~30s
 
 export async function POST(req: Request) {
   // Auth: Vercel Cron sets `Authorization: Bearer ${CRON_SECRET}`
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await syncListings();
+    const result = await syncSchellListings();
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Sync failed";

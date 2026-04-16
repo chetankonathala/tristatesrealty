@@ -15,11 +15,7 @@
   "crons": [
     {
       "path": "/api/listings/sync",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/saved-searches/notify",
-      "schedule": "5,20,35,50 * * * *"
+      "schedule": "0 3 * * *"
     }
   ]
 }

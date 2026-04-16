@@ -38,7 +38,7 @@ export function transformSimplyRetsListing(
   const agentName = `${agentFirst} ${agentLast}`.trim() || null;
 
   return {
-    mls_id: src.mlsId,
+    mls_id: Math.round(src.mlsId),
     listing_id: src.listingId ?? null,
     list_price: src.listPrice,
     list_date: src.listDate ?? null,

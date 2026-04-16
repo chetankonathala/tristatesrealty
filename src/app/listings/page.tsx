@@ -7,13 +7,13 @@ import { SearchResultsHeader } from "@/components/listings/search-results-header
 import { SearchResultsGrid } from "@/components/listings/search-results-grid";
 
 export const metadata: Metadata = {
-  title: "Homes for Sale in DE, MD, NJ, PA | Tri States Realty",
+  title: "New Homes for Sale in Delaware | Schell Brothers | Tri States Realty",
   description:
-    "Search every active home for sale in Delaware, Maryland, New Jersey, and Pennsylvania. Live MLS data updated every 15 minutes.",
+    "Browse Schell Brothers new construction communities across Delaware. Find your perfect floor plan in Lewes, Millsboro, Middletown, and more.",
 };
 
-// Tagged for ISR revalidation by sync job (plan 02-02)
-export const revalidate = 900; // 15 min fallback
+// Revalidated nightly by the Schell sync cron job
+export const revalidate = 86400; // 24 hr fallback
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

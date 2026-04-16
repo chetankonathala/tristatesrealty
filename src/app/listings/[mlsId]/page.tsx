@@ -159,10 +159,14 @@ export default async function ListingDetailPage({ params }: PageProps) {
 
       {/* === D-12 content order ends === */}
 
-      {/* Mobile sticky bottom bar (D-11) — client wrapper handles onContactAgent */}
+      {/* Mobile sticky bottom bar — client wrapper opens contact modal */}
       <MobileDetailStickyBarWrapper
         price={listing.list_price}
         daysOnMarket={listing.days_on_market}
+        mlsId={listing.mls_id}
+        communityName={(listing.raw_data as Record<string, unknown> | null)?.communityName as string | null}
+        floorPlanName={(listing.raw_data as Record<string, unknown> | null)?.planName as string | null}
+        listingAddress={listing.address_full}
       />
     </main>
   );
