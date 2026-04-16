@@ -28,6 +28,19 @@ create table if not exists listings (
 create index on listings using ivfflat (embedding vector_cosine_ops)
   with (lists = 100);
 
--- Index for common queries
-create index on listings (status, price);
-create index on listings (city, state);
+-- Index for common queries (guarded: column may not exist if table was pre-created without status)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'listings' AND column_name = 'status'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_listings_placeholder_status_price ON listings (status, price);
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'listings' AND column_name = 'city'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_listings_placeholder_city_state ON listings (city, state);
+  END IF;
+END $$;
