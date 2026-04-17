@@ -37,10 +37,10 @@
 
 ### Schell Brothers Communities
 
-- [ ] **SCHELL-01**: Dedicated community showcase section with individual page per Schell Brothers neighborhood
+- [x] **SCHELL-01**: Dedicated community showcase section with individual page per Schell Brothers neighborhood
 - [ ] **SCHELL-02**: Community pages include: hero video, overview, amenities, schools, HOA info, price range, available floorplans
 - [ ] **SCHELL-03**: Video gallery per community: embed Schell Brothers YouTube videos + support custom video uploads (stored in Supabase Storage)
-- [ ] **SCHELL-04**: Live IDX listings filtered to each Schell community displayed inline on community pages
+- [x] **SCHELL-04**: Live IDX listings filtered to each Schell community displayed inline on community pages
 - [ ] **SCHELL-05**: Interactive community map showing location, nearby schools, restaurants, highways
 - [ ] **SCHELL-06**: Community pages SEO-optimized to rank for "[community name] Schell Brothers" and "[city] new construction homes" queries
 - [ ] **SCHELL-07**: "Schedule a Tour" CTA on every community page (lead capture form)
