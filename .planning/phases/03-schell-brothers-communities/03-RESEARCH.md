@@ -682,22 +682,13 @@ const jsonLd = {
 | A4 | react-lite-youtube-embed@3.5.1 is compatible with React 19 | Standard Stack | LOW — published 2026-02-24, likely tested against React 18+; verify peer deps on install |
 | A5 | `preferred_date` encoded in `message` is sufficient for the agent use case until Phase 8 | Pattern 7, Pitfall 4 | LOW — the agent sees it in the lead email; the Phase 8 dashboard will display `message` field; no parsing required |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Schell Brothers MD/NJ/PA Heartbeat division IDs**
-   - What we know: Delaware is `division_parent_id = "1"`. The `HeartbeatCommunity.division_parent_id` field exists in the type.
-   - What's unclear: The integer IDs for other states. Likely sequential (2, 3, 4) but unconfirmed.
-   - Recommendation: Wave 0 discovery task — call Heartbeat with division_parent_id 1–10 and log which return non-empty arrays with non-DE states. This is a 10-line script.
+1. **Schell Brothers MD/NJ/PA Heartbeat division IDs** — RESOLVED: Plan 03-01 uses assumed IDs 1–4 with explicit discovery logging (`[Heartbeat] division {id}: N communities`) and `Array.isArray(result) ? result : []` guard per division. Delaware-only at launch is the documented fallback if IDs 2–4 return empty. No code blocks on confirmed IDs.
 
-2. **YouTube video ID inventory for communities**
-   - What we know: The database will store `youtube_video_ids TEXT[]`; field defaults to empty array.
-   - What's unclear: Which Schell Brothers YouTube videos should be pre-populated for launch.
-   - Recommendation: Agent identifies 3-5 high-priority community videos pre-launch. Build the system to handle empty gracefully; video section simply doesn't render if no IDs stored.
+2. **YouTube video ID inventory for communities** — RESOLVED: System handles empty `youtube_video_ids[]` gracefully — `CommunityVideos` returns null when the array is empty, so the video section simply doesn't render. Agent populates IDs pre-launch via the agent dashboard.
 
-3. **Supabase Storage for custom video uploads**
-   - What we know: SCHELL-03 requires custom video upload support. Supabase Storage is the stated approach (from requirements).
-   - What's unclear: Whether the agent will actually upload videos pre-launch, or if YouTube embeds suffice for v1.
-   - Recommendation: Build the `custom_video_urls TEXT[]` column and Storage bucket configuration, but only build the upload UI (agent side) as part of Phase 8 (Agent Dashboard). For Phase 3, the community page displays whatever is stored, including graceful empty state.
+3. **Supabase Storage for custom video uploads** — RESOLVED: `custom_video_urls TEXT[]` column is created in the Phase 3 migration. Storage bucket creation and upload UI are deferred to Phase 8 (Agent Dashboard). Community pages display whatever is stored, including graceful empty state.
 
 ## Environment Availability
 
