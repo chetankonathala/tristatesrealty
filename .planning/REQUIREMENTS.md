@@ -38,7 +38,7 @@
 ### Schell Brothers Communities
 
 - [x] **SCHELL-01**: Dedicated community showcase section with individual page per Schell Brothers neighborhood
-- [ ] **SCHELL-02**: Community pages include: hero video, overview, amenities, schools, HOA info, price range, available floorplans
+- [x] **SCHELL-02**: Community pages include: hero video, overview, amenities, schools, HOA info, price range, available floorplans
 - [ ] **SCHELL-03**: Video gallery per community: embed Schell Brothers YouTube videos + support custom video uploads (stored in Supabase Storage)
 - [x] **SCHELL-04**: Live IDX listings filtered to each Schell community displayed inline on community pages
 - [ ] **SCHELL-05**: Interactive community map showing location, nearby schools, restaurants, highways
