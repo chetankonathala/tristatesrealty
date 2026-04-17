@@ -56,3 +56,54 @@ export async function fetchFloorPlans(communityId: string): Promise<HeartbeatFlo
   });
   return Array.isArray(plans) ? plans : [];
 }
+
+// Division parent IDs for Schell Brothers states.
+// Delaware = "1" is CONFIRMED from codebase (DIVISION_PARENT_ID constant).
+// IDs 2-4 are ASSUMED sequential for MD/NJ/PA — unverified from Heartbeat API.
+// DESIGN DECISION: Delaware-only at launch is the fallback. If IDs 2-4 return
+// empty/false, those divisions are silently skipped — no breakage.
+// The sync function logs actual API responses per division to confirm behavior.
+export const SCHELL_DIVISIONS: Record<string, string> = {
+  "1": "Delaware Beaches",
+  "2": "Maryland",
+  "3": "New Jersey",
+  "4": "Pennsylvania",
+};
+
+export async function fetchCommunitiesByDivision(
+  divisionId: string
+): Promise<HeartbeatCommunity[]> {
+  try {
+    const result = await heartbeatGet<HeartbeatCommunity[]>({
+      source: "communities",
+      division_parent_id: divisionId,
+      t: Date.now().toString(),
+    });
+    const communities = Array.isArray(result) ? result : [];
+    // Log discovery: confirm which divisions actually return data
+    console.log(
+      `[Heartbeat] division_parent_id=${divisionId} (${SCHELL_DIVISIONS[divisionId] ?? "unknown"}): returned ${communities.length} communities`
+    );
+    return communities;
+  } catch (err) {
+    // Division may not exist — log and return empty
+    console.warn(
+      `[Heartbeat] division_parent_id=${divisionId} (${SCHELL_DIVISIONS[divisionId] ?? "unknown"}): fetch failed`,
+      err instanceof Error ? err.message : err
+    );
+    return [];
+  }
+}
+
+export async function fetchAllStateCommunities(): Promise<HeartbeatCommunity[]> {
+  const allCommunities: HeartbeatCommunity[] = [];
+  for (const divisionId of Object.keys(SCHELL_DIVISIONS)) {
+    const communities = await fetchCommunitiesByDivision(divisionId);
+    allCommunities.push(...communities);
+    if (communities.length > 0) {
+      // 300ms delay between successful requests to be polite
+      await new Promise((r) => setTimeout(r, 300));
+    }
+  }
+  return allCommunities;
+}
