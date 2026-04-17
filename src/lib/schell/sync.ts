@@ -1,6 +1,6 @@
 import { revalidateTag } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
-import { fetchDelawareCommunities, fetchFloorPlans } from "./client";
+import { fetchDelawareCommunities, fetchFloorPlans, fetchAllStateCommunities } from "./client";
 import { transformFloorPlan } from "./transform";
 
 function getServiceClient() {
@@ -106,6 +106,123 @@ export async function syncSchellListings(): Promise<SchellSyncResult> {
     upserted,
     deactivated,
     communities: activeCommunities.length,
+    durationMs: Date.now() - start,
+    errors,
+  };
+}
+
+export interface CommunitySyncResult {
+  upserted: number;
+  deactivated: number;
+  total_fetched: number;
+  durationMs: number;
+  errors: string[];
+}
+
+export async function syncCommunities(): Promise<CommunitySyncResult> {
+  const start = Date.now();
+  const supabase = getServiceClient();
+  const errors: string[] = [];
+
+  // 1. Fetch all communities from all state divisions
+  const allCommunities = await fetchAllStateCommunities();
+
+  // 2. Transform HeartbeatCommunity -> communities table row
+  const rows = allCommunities
+    .filter((c) => c.city && c.state) // skip incomplete records
+    .map((c) => {
+      // Prefix slug with lowercase state abbreviation to avoid cross-state collisions
+      // e.g., "de-cardinal-grove", "md-amberleigh"
+      const statePrefix = (c.state ?? "xx").toLowerCase().trim();
+      const baseSlug =
+        c.slug ||
+        c.marketing_name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+      const slug = `${statePrefix}-${baseSlug}`;
+
+      return {
+        community_id: c.community_id,
+        slug,
+        name: c.marketing_name,
+        full_name: c.community_marketing_name || null,
+        description: c.marketing_description || null,
+        short_description: c.short_description || null,
+        city: c.city,
+        state: c.state,
+        zip: c.zip || null,
+        address: c.address || null,
+        lat: c.lat ? parseFloat(c.lat) : null,
+        lng: c.lng ? parseFloat(c.lng) : null,
+        price_from: c.priced_from
+          ? parseFloat(c.priced_from.replace(/[^0-9.]/g, "")) || null
+          : null,
+        school_district: c.school_district || null,
+        school_elementary: c.school_elementary || null,
+        school_middle: c.school_middle || null,
+        school_high: c.school_high || null,
+        hoa_fee: c.hoa_monthly_fee ? parseFloat(c.hoa_monthly_fee) || null : null,
+        hoa_yearly_fee: c.hoa_yearly_fee ? parseFloat(c.hoa_yearly_fee) || null : null,
+        hoa_name: c.hoa_name || null,
+        amenities: c.amenities ?? [],
+        division_id: c.division_parent_id,
+        division_name: c.division_parent_marketing_name || null,
+        featured_image_url: c.featured_image_url || null,
+        is_sold_out: c.is_sold_out === "1",
+        is_active: true,
+        heartbeat_page_url: c.page_url || null,
+        sales_center_address: c.sales_center_address_string || c.sales_center_address || null,
+        synced_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+    });
+
+  let upserted = 0;
+
+  // 3. Upsert in batches of 50
+  for (let i = 0; i < rows.length; i += 50) {
+    const batch = rows.slice(i, i + 50);
+    const { error } = await supabase
+      .from("communities")
+      .upsert(batch, { onConflict: "community_id" });
+    if (error) {
+      errors.push(`Batch ${i}: ${error.message}`);
+    } else {
+      upserted += batch.length;
+    }
+  }
+
+  // 4. Mark communities NOT in the fetched set as inactive
+  let deactivated = 0;
+  const activeCommunityIds = rows.map((r) => r.community_id);
+  if (activeCommunityIds.length > 0) {
+    const { data: stale } = await supabase
+      .from("communities")
+      .select("id")
+      .eq("is_active", true)
+      .not("community_id", "in", `(${activeCommunityIds.join(",")})`);
+    if (stale && stale.length > 0) {
+      const { error } = await supabase
+        .from("communities")
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .not("community_id", "in", `(${activeCommunityIds.join(",")})`);
+      if (!error) deactivated = stale.length;
+    }
+  }
+
+  // 5. Trigger ISR revalidation for community pages
+  try {
+    revalidateTag("communities", {});
+  } catch (e) {
+    // Log ISR failure so it surfaces in Vercel function logs
+    console.warn("[syncCommunities] revalidateTag failed:", e);
+  }
+
+  return {
+    upserted,
+    deactivated,
+    total_fetched: allCommunities.length,
     durationMs: Date.now() - start,
     errors,
   };
