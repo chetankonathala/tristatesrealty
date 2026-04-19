@@ -2,11 +2,22 @@
 
 ## What This Is
 
-A world-class personal real estate platform for a licensed agent (Schell Brothers) serving DE, MD, NJ, and PA. The site allows buyers to browse Zillow-mirrored MLS listings, filter homes by preference, explore Schell Brothers communities via video, get mortgage pre-qualified, and submit legally binding e-sign offers — all without the agent needing to be physically present. Commission wires automatically through the broker upon deal close.
+A Zillow-level Delaware home search platform for a licensed Schell Brothers agent. Buyers browse all Delaware MLS listings with structured filters and an AI chatbot that understands natural language ("4 bed, 5 bath, $800k in Lewes") — all contact and leads route exclusively to the agent. Schell Brothers communities are featured alongside all resale inventory.
 
 ## Core Value
 
-Buyers complete the entire home-buying journey — discover, tour, qualify, offer, and close — on one site, while the agent earns commission hands-free.
+Any Delaware home buyer can find their perfect home and contact the agent in under 60 seconds — whether they search with filters, a map, or just describe what they want in plain English.
+
+## Current Milestone: v1.1 Delaware Search Platform
+
+**Goal:** Turn tristatesrealty.com into a Zillow-level Delaware home search platform with AI-powered natural language search, routing all buyer leads exclusively to dad.
+
+**Target features:**
+- All Delaware MLS listings via BrightMLS/SimplyRETS (every town, all price ranges)
+- Structured search: price, beds, baths, property type, city/zip/area + Mapbox map with listing pins
+- AI chatbot (Claude): natural language → live matching listings
+- Both chat placements: floating bubble (site-wide) + /search page with chat sidebar
+- All leads route exclusively to dad regardless of which listing a buyer views
 
 ## Requirements
 
@@ -14,51 +25,27 @@ Buyers complete the entire home-buying journey — discover, tour, qualify, offe
 
 (None yet — ship to validate)
 
-### Active
+### Active (v1.1 — Delaware Search Platform)
 
-**Listings & Data**
-- [ ] Bright MLS IDX feed integration for DE, MD, NJ, PA listings (real-time sync)
-- [ ] Dedicated Schell Brothers communities showcase section with all their active listings
-- [ ] Zillow-parity listing cards: photos, price, beds/baths, sq ft, days on market, price history
-- [ ] Advanced search & filtering: price range, beds, baths, property type, zip/city, school district, lot size, new construction vs resale
-- [ ] Individual property detail pages with full photo galleries
+**MLS Data**
+- [ ] BrightMLS IDX feed live via SimplyRETS — all Delaware listings syncing (blocked on broker IDX activation)
+- [ ] Listing cards: photo, price, beds/baths/sqft, days on market, address, MLS attribution
+- [ ] Individual listing detail pages with full photo gallery and contact form routing to dad
 
-**Schell Brothers Communities**
-- [ ] Curated community pages for each Schell Brothers neighborhood (DE/MD/NJ/PA)
-- [ ] Community video gallery: embed Schell Brothers YouTube videos + support custom video uploads
-- [ ] Community amenity highlights, HOA info, floorplan previews, price ranges
+**Structured Search**
+- [ ] Filter bar: price range, beds, baths, property type, city/zip/area
+- [ ] Mapbox map view with listing pins, clustering, click-to-detail
+- [ ] URL-based search state (shareable/bookmarkable searches)
 
-**AI & Intelligence**
-- [ ] AI home recommendation engine — learns buyer preferences from behavior and saves/views
-- [ ] Real-time market analytics dashboard: median price trends, days-on-market, price per sq ft, appreciation rates by neighborhood
-- [ ] Comparable sales (comps) on each listing page
+**AI Chat Search**
+- [ ] Floating chat bubble on every page — opens AI chat
+- [ ] Dedicated /search page: chat sidebar (left) + results map/grid (right)
+- [ ] Claude-powered NL → filter translation: "4bed 5bath $800k Lewes" → structured query → live listings
+- [ ] Chat suggests refinements when no results found
 
-**Virtual Tours**
-- [ ] 3D virtual tour embedding (Matterport / iGUIDE compatible)
-- [ ] Google Street View integration on every listing
-
-**Mortgage Pre-Qualification**
-- [ ] On-site instant mortgage pre-qual calculator/form
-- [ ] Integration with a lending partner API (e.g. Rocket Mortgage, Morty) for soft pre-approval
-
-**Offer & Transaction Pipeline**
-- [ ] Full DocuSign-style e-sign offer submission directly on site (via DocuSign API or HelloSign)
-- [ ] Buyer account creation: save searches, favorite listings, track offer status
-- [ ] Offer status dashboard for agent: review, counter, accept/decline offers remotely
-- [ ] Automated commission pipeline: deal close event triggers notification + broker wire workflow
-- [ ] Transaction timeline tracker visible to buyer (under contract → inspection → closing)
-
-**Agent Dashboard**
-- [ ] Dual-agent dashboard: manage buyer clients AND own/Schell listings
-- [ ] Lead capture and CRM-lite: contact history, notes, pipeline stage per client
-- [ ] Notification system: new offers, new leads, status changes (email + SMS)
-- [ ] Analytics: traffic, lead sources, listing views, offer conversion rates
-
-**Brand & UX**
-- [ ] Luxury dark aesthetic matching existing tristatesrealty.com (Playfair Display / Montserrat, black/white/gold palette)
-- [ ] Fully responsive (mobile-first)
-- [ ] Fast page loads (Core Web Vitals green)
-- [ ] SEO-optimized listing pages for organic search traffic
+**Lead Routing**
+- [ ] Every listing contact form routes exclusively to dad (email + SMS via Resend + Twilio)
+- [ ] Agent dashboard shows all inbound leads with listing context
 
 ### Out of Scope
 
@@ -92,5 +79,22 @@ Buyers complete the entire home-buying journey — discover, tour, qualify, offe
 | DocuSign for e-sign | Industry standard in real estate; legally binding | — Pending |
 | Single-agent v1 scope | Build for father first; expand to team later | — Pending |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-04-06 after initial project definition*
+*Last updated: 2026-04-19 after milestone v1.1 start*
