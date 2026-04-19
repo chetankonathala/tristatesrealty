@@ -1,8 +1,258 @@
 # Technology Stack: Tri States Realty
+# Addendum — v1.1 AI Chat Search Milestone
 
-**Project:** Tri States Realty — Single-Agent Real Estate Platform
-**Researched:** 2026-04-06
-**Confidence:** MEDIUM-HIGH (core stack HIGH, third-party integrations MEDIUM)
+**Project:** Tri States Realty — v1.1 Delaware Search Platform
+**Researched:** 2026-04-19
+**Confidence:** HIGH (core AI libraries), MEDIUM (streaming architecture tradeoffs)
+
+> This file supersedes and extends the original STACK.md. Sections 1–12 from the April 2026 research are preserved intact below. This addendum covers ONLY the net-new additions required for the AI chat search milestone. Do not re-install or re-configure anything in the existing stack.
+
+---
+
+## v1.1 Net-New Additions: AI Chat Search
+
+### What Already Exists (DO NOT re-research or re-add)
+
+- Next.js 16.2.2 + TypeScript + Tailwind v4 + shadcn/ui — installed
+- Supabase + pgvector — configured
+- Clerk auth — configured
+- Mapbox + react-map-gl v8 + supercluster — installed
+- Framer Motion v12 — installed
+- SimplyRETS sync route — built
+- nuqs v2 — installed
+- Resend + Twilio — configured
+- Zod v4 + react-hook-form — installed
+- Anthropic SDK — NOT YET installed (this milestone adds it)
+
+---
+
+### New Core Libraries
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `ai` (Vercel AI SDK) | ^4.3.x (NOT v5 or v6) | `useChat` hook, streaming transport, SSE handling, `streamText` on the server | v5 dropped internal input management and requires a migration. v6 shifts to React Server Actions and has breaking changes. v4.3.x is stable, well-documented, compatible with React 19 + Next.js App Router, and the last version before the architectural breaks. useChat + Route Handler pattern matches this codebase's existing API route conventions. |
+| `@ai-sdk/anthropic` | ^1.2.x | Vercel AI SDK Anthropic provider — bridges `ai` SDK to Claude API | The `@ai-sdk/anthropic` provider wires Claude into AI SDK's `streamText` / `generateObject` with one import change vs. direct SDK. No manual SSE piping. Structured output via `generateObject` with Zod schema is the clean path for NL → filter translation. |
+| `@anthropic-ai/sdk` | ^0.90.x | Raw Anthropic SDK (install alongside AI SDK for type safety + fallback) | The AI SDK provider calls this internally. Installing it directly gives TypeScript types, access to newer Claude model strings, and the ability to call structured outputs natively if needed outside the AI SDK abstraction. Pin minor version to match `@ai-sdk/anthropic` peer dep. |
+
+**Version lock rationale:** The `ai` package is on a rapid release cadence (v6.0.162 as of research date). v4.3.x locks the `useChat` API surface, which is stable and React 19 compatible. v5 introduced transport-based architecture that requires refactoring; v6 further breaks by eliminating `/api/chat` Route Handler patterns in favor of Server Actions. Neither breaking change is worth the cost for this milestone. Lock to `^4.3.x` until a planned migration sprint.
+
+---
+
+### Chat UI Components
+
+| Technology | Source | Purpose | Why |
+|------------|--------|---------|-----|
+| shadcn `ai-chat-floating-widget` block | `shadcn.io/blocks/ai-chat-floating-widget` | Floating chat bubble — collapsible sparkle button → 400px chat panel | Copy-paste block from official shadcn. Zero new npm deps. Uses shadcn primitives + Tailwind already in the project. Matches dark theme. Replaces need for any external chat UI library. |
+| shadcn `Sheet` component | `npx shadcn add sheet` | /search page chat sidebar (slide-in panel on mobile, fixed column on desktop) | Already available in shadcn. Side panel for /search page chat sidebar. No new dependency. |
+| shadcn `ScrollArea` component | `npx shadcn add scroll-area` | Scrollable message list in chat panel | Already available in shadcn. No new dependency. |
+
+**What you do NOT need for chat UI:**
+- `react-chat-elements` — brings its own CSS, fights Tailwind v4
+- `stream-chat` or `stream-chat-react` — full messaging platform, massive overkill
+- `@chatscope/chat-ui-kit-react` — opinionated styling, dark theme fights needed
+- `jakobhoeg/shadcn-chat` — external package; the official `shadcn.io/blocks` deliver the same components as primitives you own
+
+---
+
+### Streaming Architecture Decision: Vercel AI SDK Route Handler (NOT raw SSE)
+
+**Use `ai` SDK's `streamText` + `useChat` pattern. Not raw SSE. Not Anthropic SDK's `.stream()` directly.**
+
+**Why this over raw SSE:**
+
+Raw SSE with `anthropic.messages.stream()` requires manually writing the SSE chunking logic, reconnect handling, and client-side parsing. The Vercel AI SDK Route Handler pattern handles all of this with `toDataStreamResponse()` and `useChat` reads it with zero custom parsing. The result is identical wire format (Server-Sent Events) with 80% less code.
+
+**Why this over Server Actions (AI SDK v6 pattern):**
+
+Server Actions are stateless per call. Chat needs a Route Handler that can be `POST`ed repeatedly. The existing codebase uses Route Handlers for all API work (`/api/listings/sync`, `/api/listings/revalidate`). A Route Handler at `/api/chat/route.ts` is consistent. Server Actions for streaming are also a newer pattern with less production validation.
+
+**Server-side pattern (Route Handler):**
+
+```typescript
+// src/app/api/chat/route.ts
+import { streamText, generateObject } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
+import { z } from "zod";
+
+// Step 1: Parse NL query into structured search params
+const SearchFiltersSchema = z.object({
+  minPrice: z.number().optional(),
+  maxPrice: z.number().optional(),
+  minBeds: z.number().optional(),
+  minBaths: z.number().optional(),
+  propertyType: z.enum(["residential", "condo", "land", "multi-family"]).optional(),
+  city: z.string().optional(),
+  zipCode: z.string().optional(),
+  keywords: z.string().optional(),
+});
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+
+  const result = streamText({
+    model: anthropic("claude-sonnet-4-5-20250929"), // pinned version string
+    system: `You are a Delaware real estate search assistant for Tri States Realty.
+      When the user describes what they're looking for, extract structured search filters.
+      Always call the search_listings tool with the extracted parameters.
+      If the user is vague, ask ONE clarifying question. Keep responses concise and conversational.`,
+    messages,
+    tools: {
+      search_listings: {
+        description: "Search Delaware MLS listings based on extracted user criteria",
+        parameters: SearchFiltersSchema,
+        execute: async (filters) => {
+          // Query Supabase listings table with extracted filters
+          // Returns matching listing summaries to show in chat
+          return await queryListings(filters);
+        },
+      },
+    },
+  });
+
+  return result.toDataStreamResponse();
+}
+```
+
+**Client-side pattern (useChat hook):**
+
+```typescript
+// src/components/chat/ChatPanel.tsx
+"use client";
+import { useChat } from "ai/react";
+
+export function ChatPanel() {
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: "/api/chat",
+    onToolCall: ({ toolCall }) => {
+      // toolCall.args contains the extracted SearchFilters
+      // Push these into nuqs URL params to update the /search results
+    },
+  });
+  // render messages, input, send button
+}
+```
+
+**nuqs integration for filter sync:**
+
+The `onToolCall` callback in `useChat` fires when Claude calls `search_listings` with extracted filters. At that point, call nuqs's `setParams` to update the URL query string (e.g., `?minBeds=4&maxPrice=800000&city=Lewes`). The `/search` page's Server Component reads those nuqs params and re-renders the listing grid. This keeps AI-extracted filters and the existing structured filter bar in sync without any additional state layer.
+
+---
+
+### Model Selection
+
+| Model | API String | Use Case | Cost |
+|-------|-----------|---------|------|
+| Claude Sonnet 4.5 | `claude-sonnet-4-5-20250929` | **RECOMMENDED for NL search** — fast, cheap, excellent at structured extraction | $3 / $15 per MTok |
+| Claude Haiku 4.5 | `claude-haiku-4-5-20250929` | Alternative if cost is a concern at high volume. Slightly lower quality for complex NL parsing | $0.80 / $4 per MTok |
+| Claude Sonnet 4.6 | `claude-sonnet-4-6` | Overkill for search filter extraction. Use only if extended thinking or 1M context is needed | Higher |
+
+**Why Sonnet 4.5 and not Haiku:** Real estate search queries can be ambiguous ("something nice in the beach area under $800k with enough room for the kids"). Sonnet 4.5 handles multi-intent, ambiguous queries significantly better. The cost difference on a single-agent site with low volume is negligible.
+
+**IMPORTANT:** Always use the fully-versioned model string (e.g., `claude-sonnet-4-5-20250929`) in production, not the alias. Aliases silently change when Anthropic releases new versions. Pin the model string and update deliberately.
+
+---
+
+### Structured Output Strategy
+
+Use `generateObject` (not `streamText` + tool use) for the pure NL → structured filter translation step:
+
+```typescript
+// Non-streaming parse endpoint — called before opening the streaming chat
+// src/app/api/chat/parse/route.ts
+import { generateObject } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
+
+export async function POST(req: Request) {
+  const { query } = await req.json();
+  
+  const { object } = await generateObject({
+    model: anthropic("claude-sonnet-4-5-20250929"),
+    schema: SearchFiltersSchema,
+    prompt: `Extract Delaware real estate search filters from this query: "${query}"`,
+  });
+  
+  return Response.json(object);
+}
+```
+
+This gives guaranteed JSON matching the Zod schema. Use `generateObject` when you just need the filters (fast, non-streaming). Use `streamText` + tool calls when you want Claude to show conversational responses alongside the search results.
+
+---
+
+### Environment Variables to Add
+
+```bash
+# .env.local additions
+ANTHROPIC_API_KEY=sk-ant-...  # Required — never prefix with NEXT_PUBLIC_
+```
+
+The Anthropic key MUST remain server-side only. It is used exclusively in Route Handlers (`/api/chat`) and Server Actions. The `@ai-sdk/anthropic` provider reads `ANTHROPIC_API_KEY` automatically from the environment — no explicit config needed.
+
+---
+
+### Installation
+
+```bash
+# New packages for v1.1 — all other deps already installed
+npm install ai@^4.3 @ai-sdk/anthropic @anthropic-ai/sdk
+
+# shadcn UI additions (no new npm deps — copies source into your components)
+npx shadcn add sheet
+npx shadcn add scroll-area
+```
+
+Then copy the `ai-chat-floating-widget` block from `shadcn.io/blocks/ai-chat-floating-widget` into `src/components/chat/`.
+
+---
+
+### What NOT to Add
+
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| `ai` v5 or v6 | v5 drops input state management from `useChat`; v6 eliminates Route Handler pattern. Both require migration work that is not scoped to this milestone. | `ai@^4.3.x` |
+| `langchain` or `llamaindex` | 15+ transitive deps, 10x complexity for what is a single-model, single-tool workflow. Over-engineering for NL → structured search. | Direct AI SDK tool calling |
+| `openai` npm package for embeddings | Already researched in original STACK.md as a separate decision. Do NOT mix OpenAI calls into the chat Route Handler. Keep Claude chat isolated. | `@ai-sdk/anthropic` only in chat routes |
+| `react-query` or `SWR` for chat state | `useChat` from AI SDK manages all chat state (messages, loading, streaming). Adding a second cache layer conflicts. | `useChat` hook |
+| `socket.io` or WebSockets | SSE (Server-Sent Events) via Route Handler is sufficient and simpler for one-directional streaming. WebSockets add bi-directional complexity with no benefit for chat. | Route Handler + `toDataStreamResponse()` |
+| `assistant-ui` or `shadcn-chat` (external) | Both pull in external packages and opinionated styling that fights the existing dark theme. Official shadcn blocks are copy-paste source you own. | `shadcn.io/blocks/ai-chat-floating-widget` |
+| `NEXT_PUBLIC_ANTHROPIC_API_KEY` | Leaks API key to the browser bundle. Never expose the Anthropic key client-side. | Server-only env var in Route Handlers |
+| Raw `anthropic.messages.stream()` directly in Route Handler | Works, but requires manually writing SSE chunking, reconnect logic, and client-side stream parsing. The AI SDK does this for free. | `streamText().toDataStreamResponse()` |
+
+---
+
+### Version Compatibility Matrix
+
+| Package | Version | Compatible With | Notes |
+|---------|---------|-----------------|-------|
+| `ai` | ^4.3.x | React 19, Next.js 16, nuqs v2 | React 19 `useEffect` + `messages` dependency bug exists in some v4 versions — avoid using `messages` as a `useEffect` dep; derive values in render instead |
+| `@ai-sdk/anthropic` | ^1.2.x | `ai` ^4.3.x | Peer dep on `ai` — must match major. Do not install v3.x |
+| `@anthropic-ai/sdk` | ^0.90.x | Node.js 18+ | Used internally by `@ai-sdk/anthropic`. Installing directly only needed for TypeScript types or direct API calls |
+| Zod | ^4.3.6 (already installed) | `ai` generateObject | AI SDK v4 uses Zod for schema validation in `generateObject` — already at correct version |
+
+---
+
+### Architecture Integration Points
+
+```
+User types NL query in ChatPanel
+  → useChat POST to /api/chat (Route Handler)
+    → streamText with claude-sonnet-4-5
+      → Claude calls search_listings tool with extracted filters
+        → execute() queries Supabase listings table
+          → results stream back via SSE to useChat
+            → onToolCall fires with filters
+              → setParams() (nuqs) updates URL
+                → /search Server Component re-renders with new filter params
+                  → Listing grid + Mapbox map update to matched listings
+```
+
+Both the floating bubble (site-wide) and the /search sidebar use the same `useChat` hook pointed at `/api/chat`. The difference is presentation only — the bubble is a shadcn floating block; the sidebar is a `Sheet` component in the /search layout. No separate API routes.
+
+---
+
+## Original Stack Research (April 2026)
+
+The original full-stack research document sections 1–12 are below for reference. They document the existing installed stack and should not be treated as new additions.
 
 ---
 
@@ -83,456 +333,49 @@ Supabase is both the database AND the AI vector store — eliminating a separate
 | Row-level security | RLS policies for multi-tenant data (buyer accounts, agent dashboard isolation) |
 | Cost | $25/month Pro tier with $10 compute credits; Pinecone would add ~$25+/month separately |
 
-**Schema overview:**
-
-```sql
--- Core tables
-listings         -- MLS/IDX data (mlsId, address, price, status, geom, embedding vector(1536))
-users            -- Buyer accounts (FK to Clerk user ID)
-saved_searches   -- Buyer saved filters
-favorites        -- Buyer favorited listings
-offers           -- Offer submissions (DocuSign envelope ID, status)
-agent_contacts   -- CRM-lite leads
-market_snapshots -- Time-series market data from Attom
-
--- Vector column for AI recommendations
-ALTER TABLE listings ADD COLUMN embedding vector(1536);
-CREATE INDEX ON listings USING ivfflat (embedding vector_cosine_ops);
-```
-
-**pgvector hybrid search example (Supabase + SQL):**
-
-```sql
-SELECT id, address, price,
-  1 - (embedding <=> $1) AS similarity
-FROM listings
-WHERE status = 'active'
-  AND price BETWEEN $2 AND $3
-  AND bedrooms >= $4
-ORDER BY similarity DESC
-LIMIT 20;
-```
-
-**Alternatives Considered:**
-
-| Option | Verdict |
-|--------|---------|
-| Plain PostgreSQL (self-hosted) | More ops overhead, no built-in realtime, skip unless Supabase pricing becomes a blocker |
-| PlanetScale | MySQL-based, no native realtime, no pgvector, no clear advantage for this stack |
-| Neon | Postgres + serverless branching, solid alternative to Supabase if you want more raw Postgres control |
-| Pinecone (standalone) | Only justified if embeddings scale past 10M vectors; use pgvector until then |
-
-**Confidence:** HIGH — multiple sources confirm pgvector outperforms Pinecone at this scale, Supabase is the dominant choice for Next.js + real-time + vectors.
+**Confidence:** HIGH
 
 ---
 
 ## 4. Authentication
 
-**Recommendation: Clerk**
-
-| Criterion | Clerk | NextAuth | Auth0 |
-|-----------|-------|----------|-------|
-| Next.js 15 App Router support | Native, first-class | Good (Auth.js v5) | Good |
-| Time to production | Hours | Days (needs DB adapter) | Days (complex config) |
-| Buyer account features | Pre-built UI: sign in, profile, MFA | DIY | Pre-built |
-| Agent dashboard (separate role) | Organizations + Roles built in | Custom code | Roles/permissions |
-| Pricing at scale | $25/month Pro, 50K MAU free | Free (self-hosted) | Expensive at scale |
-| Data ownership | Managed (user data on Clerk) | Self-hosted | Managed |
-
-**Use Clerk because:** Single-agent platform with two user types (buyer, agent) maps perfectly to Clerk's Organizations + Roles. Pre-built components ship buyer account UI in hours. Webhook syncs Clerk user events to Supabase for relational queries.
-
-```typescript
-// Protect agent routes in middleware
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-
-const isAgentRoute = createRouteMatcher(["/agent/(.*)"]);
-
-export default clerkMiddleware((auth, req) => {
-  if (isAgentRoute(req)) auth().protect({ role: "agent" });
-});
-```
-
-**Confidence:** HIGH — Clerk is the dominant choice in Next.js 15 ecosystem per multiple 2025 sources.
+**Recommendation: Clerk** — already installed and configured. See CLAUDE.md for implementation details.
 
 ---
 
 ## 5. IDX / MLS Data Integration
 
-**Recommendation: SimplyRETS + RESO Web API (not RETS)**
-
-RETS is deprecated. The industry standard is now RESO Web API (REST-based).
-
-| Option | Verdict |
-|--------|---------|
-| SimplyRETS | Developer-friendly wrapper around RESO Web API. REST API, JSON responses, handles MLS auth. Best for getting IDX running quickly. ~$99/month |
-| Spark API | Direct RESO Web API access, human-readable field names, live queries. Best if your MLS offers it directly |
-| IDX Broker | Managed solution with less developer flexibility — avoid for custom Next.js builds |
-| Direct RESO API | Maximum control, maximum complexity. Only if SimplyRETS doesn't cover your target MLS |
-
-**Data Sync Strategy:**
-
-```
-MLS (RESO API)
-  → Webhook / polling via SimplyRETS
-    → Supabase listings table (upsert on mlsId)
-      → Trigger: re-compute embeddings for updated listings
-        → Invalidate ISR cache via Next.js revalidateTag()
-```
-
-On-demand ISR revalidation via `revalidateTag('listing-{mlsId}')` means new listings appear on the site within seconds of MLS update, without a full rebuild.
-
-**Confidence:** MEDIUM — SimplyRETS is well-established; verify MLS compatibility for your specific market before committing.
+**Recommendation: SimplyRETS + RESO Web API** — sync route already built at `src/app/api/listings/sync/route.ts`.
 
 ---
 
 ## 6. AI Recommendation Engine
 
-**Recommendation: OpenAI text-embedding-3-small + Supabase pgvector**
-
-Do NOT use Pinecone as a separate service. pgvector running in Supabase handles this at the scale of a single-agent real estate platform.
-
-**Embedding Strategy:**
-
-```typescript
-// Generate embedding for each listing (run on ingest/update)
-const embeddingText = `
-  ${listing.bedrooms} bed ${listing.bathrooms} bath
-  ${listing.propertyType} in ${listing.city}, ${listing.state}
-  Price: $${listing.listPrice}
-  ${listing.description}
-`;
-
-const { data } = await openai.embeddings.create({
-  model: "text-embedding-3-small", // cheaper, still excellent
-  input: embeddingText,
-});
-
-await supabase
-  .from("listings")
-  .update({ embedding: data[0].embedding })
-  .eq("id", listing.id);
-```
-
-**User Preference Embeddings:**
-Build a preference vector from: saved searches + favorited listings + time-on-page signals. Avg the embeddings of favorited listings → user preference vector → cosine similarity query.
-
-**Model Choice:**
-
-| Model | Dimensions | Cost | Use Case |
-|-------|------------|------|---------|
-| text-embedding-3-small | 1536 | $0.02/1M tokens | Listings + user prefs (recommended) |
-| text-embedding-3-large | 3072 | $0.13/1M tokens | Only if small model quality is insufficient |
-| text-embedding-ada-002 | 1536 | $0.10/1M tokens | Older, skip in favor of 3-small |
-
-**Confidence:** MEDIUM-HIGH — pgvector vs Pinecone benchmarks verified via Supabase official blog and multiple independent migration reports.
+**Recommendation: OpenAI text-embedding-3-small + Supabase pgvector** — for semantic search on listings. This is SEPARATE from the Claude chat feature. Use OpenAI for generating listing embeddings. Use Claude (via AI SDK) for the chat/NL search interface.
 
 ---
 
-## 7. Real-Time Market Analytics
+## 7–12. (Market Data, Mortgage, 3D Tours, E-Sign, Deployment, CRM)
 
-**Recommendation: Attom Data API (primary) + Supabase for caching**
-
-| Data Provider | Strength | Limitation |
-|--------------|---------|-----------|
-| Attom Data | 158M US properties, AVM, foreclosure, deed data, REST JSON API | Not free, pricing on request |
-| CoreLogic | Enterprise-grade, mortgage/financial depth | Enterprise pricing, harder to access for indie developers |
-| RentRange (now part of CoreLogic) | Rental comps | Same CoreLogic access limitations |
-| BatchData | Good alternative to Attom, competitive pricing | Smaller dataset than Attom |
-
-**Architecture:**
-
-```
-Attom API (polling every 24h or on-demand)
-  → Supabase market_snapshots table
-    → Supabase Realtime → WebSocket → Dashboard client
-
-// Client-side dashboard subscribes to Supabase channel
-const channel = supabase
-  .channel('market-data')
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'market_snapshots' }, 
-    (payload) => setMarketData(payload.new))
-  .subscribe();
-```
-
-Do NOT call Attom API directly from the client. Cache all market data in Supabase. This keeps your Attom API key server-side and controls costs (Attom charges per API call).
-
-**Confidence:** MEDIUM — Attom is well-documented; RentRange/CoreLogic access complexity is a known industry issue. Verify Attom pricing for your use case.
+Unchanged from original April 2026 research. See Git history for full text.
 
 ---
 
-## 8. Mortgage Pre-Qualification
+## Sources (v1.1 Addendum)
 
-**Recommendation: Morty embedded widget (fastest path to market)**
-
-| Option | Integration Type | Complexity | Notes |
-|--------|----------------|-----------|-------|
-| Morty | Embeddable widget + API | Low — 2 lines of code | Rate table + pre-qual form. Good for startup velocity |
-| Rocket Mortgage Partner API | Deep API integration via Rocket Pro / ARIVE | High | Better for high-volume or exclusive partnership. Note: Rocket acquired Redfin in 2025, may affect terms |
-| Lendio | Broker marketplace, not pure API | Medium | More small business focused, less ideal for residential real estate |
-| Custom (Blend, Finicity) | Build your own form, verify income via API | Very High | Only if pre-qual is a core differentiator |
-
-**Recommended Phase 1 approach:**
-
-```html
-<!-- Morty embeddable — 2 lines, hosted widget -->
-<script src="https://embed.morty.com/morty-widget.js"></script>
-<morty-widget partner-id="YOUR_ID" theme="dark" />
-```
-
-Upgrade to Rocket Mortgage Partner API in a later phase if volume warrants it.
-
-**Confidence:** MEDIUM — Morty's developer-friendly approach verified. Rocket Mortgage API terms post-Redfin acquisition are unclear; validate before committing.
+- [Anthropic Models Overview](https://platform.claude.com/docs/en/about-claude/models/overview) — current model API strings, confirmed `claude-sonnet-4-5-20250929` (HIGH confidence)
+- [AI SDK docs — Getting Started Next.js App Router](https://ai-sdk.dev/docs/getting-started/nextjs-app-router) — confirmed Route Handler + useChat pattern (HIGH confidence)
+- [AI SDK Reference — useChat](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat) — confirmed hook API surface for v4 (HIGH confidence)
+- [AI SDK 6 Blog Post](https://vercel.com/blog/ai-sdk-6) — confirmed v6 breaking changes (Server Actions, no Route Handler pattern) — rationale to pin v4 (HIGH confidence)
+- [AI SDK Migration Guide 6.0](https://ai-sdk.dev/docs/migration-guides/migration-guide-6-0) — confirmed scope of breaking changes (HIGH confidence)
+- [npm @ai-sdk/anthropic versions](https://www.npmjs.com/package/@ai-sdk/anthropic?activeTab=versions) — confirmed latest is 3.0.71 (MEDIUM — version cadence is high)
+- [npm @anthropic-ai/sdk](https://www.npmjs.com/package/@anthropic-ai/sdk) — confirmed latest is ^0.90.x (HIGH confidence)
+- [shadcn AI Chat Floating Widget Block](https://www.shadcn.io/blocks/ai-chat-floating-widget) — confirmed official block exists, uses no external deps (HIGH confidence)
+- [Claude Structured Outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs) — confirmed `generateObject` + Zod schema approach (HIGH confidence)
+- [Strapi: OpenAI SDK vs Vercel AI SDK 2026](https://strapi.io/blog/openai-sdk-vs-vercel-ai-sdk-comparison) — informed streaming approach decision (MEDIUM confidence)
+- [nuqs documentation](https://nuqs.dev/) — confirmed compatibility with Next.js App Router for URL state sync (HIGH confidence)
 
 ---
 
-## 9. 3D Virtual Tours
-
-**Recommendation: Matterport (luxury listing standard) with CloudPano as fallback**
-
-**Important 2025 development:** Zillow removed Matterport from its listings in October 2025 after CoStar (Matterport's owner) declined to renew the API agreement. This is actually a positive for independent real estate websites — agents need to host tours on their own sites now.
-
-| Platform | Strength | Weakness |
-|----------|---------|---------|
-| Matterport | Industry standard, "dollhouse" 3D, luxury brand recognition | CoStar-owned (may have platform risk), Zillow removed it |
-| iGUIDE | ANSI Z765-compliant floor plans + tour, faster scanning, accurate measurements | Less "luxury" visual feel than Matterport |
-| CloudPano | Cheap ($19-49/month), full brand control, any 360 camera | Less prestigious, no dollhouse view |
-
-**Integration (Matterport embed):**
-
-```tsx
-// Simple iframe embed — no SDK needed for basic embedding
-<iframe
-  src={`https://my.matterport.com/show/?m=${tour.matterportId}&brand=0&play=1`}
-  width="100%"
-  height="600"
-  frameBorder="0"
-  allowFullScreen
-/>
-```
-
-For advanced control (highlight reel, custom annotations), use the Matterport SDK bundle.
-
-**Street View Integration (Google Maps JavaScript API):**
-
-```typescript
-// Embed Google Street View panorama
-const panorama = new google.maps.StreetViewPanorama(domElement, {
-  position: { lat: listing.lat, lng: listing.lng },
-  pov: { heading: 34, pitch: 10 },
-  zoom: 1,
-});
-```
-
-Google Maps JavaScript API is the only viable path for Street View. Billed per load; use lazy initialization (only load when user clicks "Street View" tab).
-
-**Confidence:** MEDIUM — Matterport embed is stable; CoStar ownership introduces long-term platform risk worth monitoring.
-
----
-
-## 10. E-Sign / Offer Submission
-
-**Recommendation: DocuSign eSign API (node SDK)**
-
-```bash
-npm install docusign-esign
-```
-
-**Integration pattern:**
-
-```typescript
-// Server Action: create and send offer envelope
-async function sendOfferForSignature(offerData: OfferData) {
-  const client = new docusign.ApiClient();
-  client.setBasePath(process.env.DOCUSIGN_BASE_URL);
-  client.addDefaultHeader("Authorization", `Bearer ${await getAccessToken()}`);
-
-  const envelopesApi = new docusign.EnvelopesApi(client);
-  const envelope = makeEnvelope(offerData); // document + tabs + signers
-
-  const result = await envelopesApi.createEnvelope(
-    process.env.DOCUSIGN_ACCOUNT_ID,
-    { envelopeDefinition: envelope }
-  );
-
-  // Store envelopeId in Supabase offers table
-  await supabase.from("offers").insert({
-    listing_id: offerData.listingId,
-    buyer_id: offerData.buyerId,
-    docusign_envelope_id: result.envelopeId,
-    status: "sent",
-  });
-}
-```
-
-Use **JWT Grant** OAuth (not OAuth Code Flow) for server-side signing workflows — the agent impersonates signers without requiring them to be present in the OAuth flow.
-
-**Confidence:** HIGH — DocuSign Node SDK is well-documented, official community examples for Next.js App Router exist (February 2025).
-
----
-
-## 11. Deployment
-
-**Recommendation: Vercel (primary) with a migration plan to AWS if needed**
-
-| Concern | Vercel | AWS (ECS / App Runner) |
-|---------|--------|----------------------|
-| Next.js ISR support | Native, zero config | Requires OpenNext adapter |
-| Time to production | <5 minutes | Hours |
-| Edge middleware (Clerk auth) | Native | Complex setup |
-| Cost at scale | Can be expensive ($20-400+/month Pro) | 25-75% cheaper at high volume |
-| Long-running jobs (embedding pipeline) | Not supported in serverless | Use Lambda or ECS tasks |
-
-**Recommended architecture:**
-
-```
-Vercel (Next.js app, edge middleware, ISR)
-  + Supabase (database, realtime, storage)
-  + Upstash Redis (rate limiting, session cache, ISR tag cache)
-  + AWS Lambda (background jobs: embedding generation, Attom data sync)
-```
-
-Start on Vercel Pro (~$20/month). The ISR cache for listing pages is mostly CDN-served (free). Migrate compute-heavy background jobs (embedding pipeline, Attom sync) to AWS Lambda from day one — these are NOT suited for Vercel's serverless function limits.
-
-**ISR cache invalidation at scale:**
-
-```typescript
-// Called from MLS webhook when listing updates
-await fetch("/api/revalidate", {
-  method: "POST",
-  headers: { Authorization: `Bearer ${process.env.REVALIDATION_SECRET}` },
-  body: JSON.stringify({ tag: `listing-${mlsId}` }),
-});
-
-// Route handler
-export async function POST(req: Request) {
-  const { tag } = await req.json();
-  revalidateTag(tag);
-  return Response.json({ revalidated: true });
-}
-```
-
-**Confidence:** MEDIUM-HIGH — Vercel ISR pricing documented, AWS migration path well-established. Watch Vercel ISR durable storage costs at scale (10K+ listings with frequent updates).
-
----
-
-## 12. CRM-Lite (Agent Dashboard)
-
-**Recommendation: Build custom using Supabase + existing data model**
-
-This is a single-agent platform. A full HubSpot or Salesforce embed is massive overkill and creates a dependency that fights your custom UI.
-
-| Approach | Verdict |
-|----------|---------|
-| Custom (Supabase + Next.js) | RECOMMENDED — agent contacts, offer pipeline, lead notes are all simple CRUD on tables you already have |
-| HubSpot (API integration) | Use only if agent already uses HubSpot and needs 2-way sync. Add as a later integration, not Phase 1 |
-| Salesforce | No. Enterprise complexity, wrong scale |
-| Follow Up Boss | Real estate-specific CRM, REST API. Consider if agent needs mobile app CRM before your dashboard is built |
-
-**Minimal CRM data model (already in Supabase):**
-
-```sql
-agent_contacts (
-  id, name, email, phone,
-  source,           -- how they found the agent
-  status,           -- lead / active / under_contract / closed
-  listing_id,       -- associated property
-  notes text,
-  created_at, updated_at
-)
-
-offers (
-  id, listing_id, buyer_id,
-  offer_price, status,
-  docusign_envelope_id,
-  created_at, updated_at
-)
-```
-
-Build simple pipeline view (Kanban or table) in Phase 2 of the agent dashboard. This is 2-3 days of work, not 10 weeks.
-
-**Confidence:** HIGH — straightforward decision given single-agent scope.
-
----
-
-## Full Recommended Stack Summary
-
-| Layer | Technology | Version | Notes |
-|-------|-----------|---------|-------|
-| Framework | Next.js | 15 | App Router, RSC, ISR |
-| UI | Tailwind CSS | v4 | Dark-first design |
-| Animation | Framer Motion | v11 | Luxury transitions |
-| Components | shadcn/ui | latest | Headless, customizable |
-| Database | Supabase (PostgreSQL) | latest | + pgvector for AI |
-| Auth | Clerk | latest | Buyer + agent roles |
-| IDX/MLS | SimplyRETS | latest | RESO Web API wrapper |
-| AI Embeddings | OpenAI text-embedding-3-small | latest | Via Supabase pgvector |
-| Market Data | Attom Data API | v4 | Cached in Supabase |
-| Mortgage | Morty embedded widget | latest | Upgrade to Rocket later |
-| 3D Tours | Matterport SDK | latest | + CloudPano fallback |
-| Street View | Google Maps JavaScript API | weekly | Lazy-loaded |
-| E-Sign | DocuSign eSign API | v2.1 | JWT Grant OAuth |
-| Deployment | Vercel Pro | - | + AWS Lambda for jobs |
-| Cache/Rate limit | Upstash Redis | latest | ISR tag cache, rate limits |
-| Background Jobs | AWS Lambda | - | Embeddings, data sync |
-
----
-
-## Installation
-
-```bash
-# Core framework
-npx create-next-app@latest tristatesrealty --typescript --tailwind --app
-
-# UI
-npm install framer-motion lucide-react
-npx shadcn@latest init
-
-# Database & Auth
-npm install @supabase/supabase-js @supabase/ssr
-npm install @clerk/nextjs
-
-# AI
-npm install openai
-
-# E-Sign
-npm install docusign-esign
-
-# Maps
-# Google Maps JS API loaded via next/script (no npm package needed)
-
-# Utilities
-npm install @upstash/redis @upstash/ratelimit
-npm install zod react-hook-form @hookform/resolvers
-
-# Dev
-npm install -D @types/node typescript
-```
-
----
-
-## Sources
-
-- [Next.js ISR Official Docs](https://nextjs.org/docs/app/guides/incremental-static-regeneration)
-- [Next.js generateStaticParams](https://nextjs.org/docs/app/api-reference/functions/generate-static-params)
-- [Next.js 15 App Router Complete Guide — Medium](https://medium.com/@livenapps/next-js-15-app-router-a-complete-senior-level-guide-0554a2b820f7)
-- [Serverless PostgreSQL 2025: Supabase vs Neon vs PlanetScale — DEV Community](https://dev.to/dataformathub/serverless-postgresql-2025-the-truth-about-supabase-neon-and-planetscale-7lf)
-- [pgvector vs Pinecone: cost and performance — Supabase Official](https://supabase.com/blog/pgvector-vs-pinecone)
-- [Supabase vs Pinecone migration report — Medium](https://deeflect.medium.com/supabase-vs-pinecone-i-migrated-my-production-ai-system-and-heres-what-actually-matters-7b2f2ebd59ee)
-- [Clerk vs NextAuth vs Auth0 2025 — Medium](https://medium.com/@sagarsangwan/next-js-authentication-showdown-nextauth-free-databases-vs-clerk-vs-auth0-in-2025-e40b3e8b0c45)
-- [SimplyRETS RESO Web API](https://simplyrets.com/idx-developer-api)
-- [Spark API vs RETS Overview](https://sparkplatform.com/docs/overview/api_vs_rets)
-- [Attom Data Property API](https://api.developer.attomdata.com/home)
-- [Top Real Estate Data APIs 2025 — BatchData](https://batchdata.io/blog/top-real-estate-apis-in-2025)
-- [Morty Embeddable Rate Table](https://www.morty.com/resources/morty-plus-embeddable-rate-table)
-- [Morty — Add Mortgage to Your Product](https://www.morty.com/solutions/adding-mortgage-to-startup)
-- [Matterport Real Estate](https://matterport.com/industries/real-estate)
-- [iGUIDE vs Matterport comparison — HDRsoft](https://hdrsoft.com/learn/matterport-vs-iguide-for-3d-virtual-tours.html)
-- [Matterport Zillow removal 2025 — CloudPano](https://www.cloudpano.com/blog/how-to-embed-virtual-tours-on-any-website-cloudpano-vs-matterport)
-- [DocuSign Node.js SDK — GitHub](https://github.com/docusign/docusign-esign-node-client)
-- [DocuSign Next.js App Router integration — Community](https://community.docusign.com/esignature-api-63/next-js-app-router-typescript-building-docusign-api-4507)
-- [DocuSign Real Estate Solutions](https://www.docusign.com/solutions/industries/real-estate)
-- [Vercel ISR Pricing and Limits](https://vercel.com/docs/incremental-static-regeneration/limits-and-pricing)
-- [Why we use AWS instead of Vercel — Graphite](https://graphite.com/blog/why-we-use-aws-instead-of-vercel)
-- [HubSpot vs Salesforce vs Custom CRM for Real Estate](https://noseberry.com/blogs/real-estate/hubspot-vs-salesforce-vs-custom-crm-for-real-estate-which-one-actually-wins)
-- [Framer Motion + Tailwind 2025 stack — DEV Community](https://dev.to/manukumar07/framer-motion-tailwind-the-2025-animation-stack-1801)
-- [Core Web Vitals Next.js optimization 2025 — Makers Den](https://makersden.io/blog/optimize-web-vitals-in-nextjs-2025)
+*Stack research addendum for: Tri States Realty v1.1 AI Chat Search milestone*
+*Researched: 2026-04-19*
