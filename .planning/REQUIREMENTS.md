@@ -1,123 +1,87 @@
 # Requirements: Tri States Realty
 
 **Defined:** 2026-04-06
-**Core Value:** Buyers complete the entire home-buying journey on one site — discover, tour, qualify, offer, close — while the agent earns commission hands-free.
+**Updated:** 2026-04-19 for milestone v1.1
+**Core Value:** Any Delaware home buyer can find their perfect home and contact the agent in under 60 seconds — whether they search with filters, a map, or plain English.
 
-## v1 Requirements
+## Validated Requirements (Milestone v1.0)
 
 ### Foundation & Infrastructure
-
-- [x] **INFRA-01**: Next.js 15 App Router project initialized with TypeScript, Tailwind CSS, and ESLint
-- [x] **INFRA-02**: Supabase project configured (PostgreSQL + pgvector extension enabled)
-- [x] **INFRA-03**: Clerk authentication integrated for buyer accounts and agent admin
-- [ ] **INFRA-04**: Vercel deployment configured with custom domain (tristatesrealty.com)
-- [ ] **INFRA-05**: AWS Lambda configured for background jobs (embedding generation, data polling)
-- [x] **INFRA-06**: Environment configuration for all third-party API keys
+- ✓ **INFRA-01**: Next.js 16 App Router project initialized with TypeScript, Tailwind v4, ESLint — Phase 1
+- ✓ **INFRA-02**: Supabase project configured (PostgreSQL + pgvector extension enabled) — Phase 1
+- ✓ **INFRA-03**: Clerk authentication integrated for buyer accounts and agent admin — Phase 1
+- ✓ **INFRA-06**: Environment configuration for all third-party API keys — Phase 1
 
 ### Design System
-
-- [ ] **DS-01**: Luxury dark design system — black/charcoal background, white text, gold accent, Playfair Display + Montserrat typography
-- [ ] **DS-02**: Fully responsive mobile-first layout (breakpoints: mobile, tablet, desktop)
-- [ ] **DS-03**: Core component library: nav, footer, cards, buttons, modals, filters, maps
-- [ ] **DS-04**: Animated page transitions and scroll-triggered reveals
-- [ ] **DS-05**: Core Web Vitals green across all pages (LCP < 2.5s, CLS < 0.1, INP < 200ms)
-
-### IDX Listings
-
-- [ ] **IDX-01**: Bright MLS IDX feed via SimplyRETS RESO Web API integrated (DE, MD, NJ, PA)
-- [ ] **IDX-02**: Listings sync every 15 minutes; new listings trigger ISR revalidation via webhook
-- [ ] **IDX-03**: Listing search page with map view (Mapbox GL) + list view toggle
-- [ ] **IDX-04**: Advanced filters: price range, beds, baths, property type, sq ft, zip/city, county, school district, new construction vs resale, waterfront, garage, lot size
-- [ ] **IDX-05**: Listing detail page: full photo gallery (lightbox), price, address, beds/baths/sqft, description, open house dates, days on market, price history
-- [ ] **IDX-06**: Google Street View embed on every listing detail page
-- [ ] **IDX-07**: SEO-optimized listing pages with JSON-LD RealEstateListing structured data
-- [ ] **IDX-08**: Comparable sales (comps) section on each listing detail page
-- [ ] **IDX-09**: MLS attribution and Fair Housing logo displayed per Bright MLS rules
-- [ ] **IDX-10**: Saved searches with email + SMS alert notifications when new matches appear
+- ✓ **DS-01**: Luxury dark design system — black/charcoal background, white text, gold accent, Playfair Display + Montserrat — Phase 1
+- ✓ **DS-02**: Fully responsive mobile-first layout — Phase 1
+- ✓ **DS-03**: Core component library: nav, footer, cards, buttons, modals, filters, maps — Phase 1
 
 ### Schell Brothers Communities
-
-- [x] **SCHELL-01**: Dedicated community showcase section with individual page per Schell Brothers neighborhood
-- [x] **SCHELL-02**: Community pages include: hero video, overview, amenities, schools, HOA info, price range, available floorplans
-- [x] **SCHELL-03**: Video gallery per community: embed Schell Brothers YouTube videos + support custom video uploads (stored in Supabase Storage)
-- [x] **SCHELL-04**: Live IDX listings filtered to each Schell community displayed inline on community pages
-- [x] **SCHELL-05**: Interactive community map showing location, nearby schools, restaurants, highways
-- [x] **SCHELL-06**: Community pages SEO-optimized to rank for "[community name] Schell Brothers" and "[city] new construction homes" queries
-- [x] **SCHELL-07**: "Schedule a Tour" CTA on every community page (lead capture form)
-
-### Buyer Accounts & AI Recommendations
-
-- [ ] **BUYER-01**: Buyer account creation and login via Clerk (email + Google OAuth)
-- [ ] **BUYER-02**: Saved listings ("favorites") with persistent list across sessions
-- [ ] **BUYER-03**: Saved searches that auto-run and notify buyer of new matches
-- [ ] **BUYER-04**: Buyer dashboard: favorites, saved searches, offer history, transaction status
-- [ ] **BUYER-05**: AI recommendation engine — OpenAI text-embedding-3-small + pgvector cosine similarity on listing attributes
-- [ ] **BUYER-06**: Recommendations update based on viewed listings, saves, and search history
-- [ ] **BUYER-07**: Natural language / conversational search ("find me a 4-bed home near good schools under $600k in Newark DE")
-- [ ] **BUYER-08**: "Homes you may like" section on homepage and buyer dashboard
-
-### Market Analytics
-
-- [ ] **MKT-01**: Attom Data API integrated — polling every 24h into Supabase market_snapshots table
-- [ ] **MKT-02**: Neighborhood market dashboard: median sale price trend (12mo), days-on-market trend, price per sq ft, list-to-sale ratio, # of active listings
-- [ ] **MKT-03**: Market stats widget on every listing detail page (neighborhood-level data)
-- [ ] **MKT-04**: Seller home valuation tool (AVM) on homepage — enter address → instant estimate → email capture → agent follow-up trigger
-- [ ] **MKT-05**: Market data updates pushed to dashboard via Supabase Realtime (WebSocket)
-
-### Mortgage Pre-Qualification
-
-- [ ] **MORT-01**: Morty embedded pre-qual widget integrated on site (dark-mode themed)
-- [ ] **MORT-02**: Pre-qual CTA surfaced on listing detail pages and at offer initiation
-- [ ] **MORT-03**: Pre-qual completion event triggers lead notification to agent
-
-### E-Sign Offer Pipeline
-
-- [ ] **OFFER-01**: Offer intent form on listing detail pages — buyer enters offer price, contingencies, closing timeline, financing type
-- [ ] **OFFER-02**: DocuSign embedded signing via createRecipientView — buyer signs without leaving site
-- [ ] **OFFER-03**: State-specific offer form logic: DE, MD, PA (standard), NJ (mandatory attorney review disclosure + 3-day window status)
-- [ ] **OFFER-04**: NAR 2024 compliance: buyer agent compensation field + Buyer Representation Agreement (BRA) envelope included
-- [ ] **OFFER-05**: Agent approval gate: offer terms submitted → agent notified → agent triggers DocuSign template send → buyer signs
-- [ ] **OFFER-06**: DocuSign Connect webhook: envelope-completed event → Dotloop loop auto-created with signed PDF attached
-- [ ] **OFFER-07**: Offer status tracker visible to buyer: Submitted → Sent for Signature → Signed → Under Review (NJ: Attorney Review) → Accepted / Countered / Declined
-- [ ] **OFFER-08**: Automated commission pipeline: deal-close event → broker notification email + CDA generation trigger
-
-### Agent Dashboard
-
-- [ ] **AGENT-01**: Secure agent dashboard (Clerk role-gated) — separate from buyer-facing site
-- [ ] **AGENT-02**: Offer management: view all incoming offers, offer details, accept / counter / decline actions
-- [ ] **AGENT-03**: Listings management: view own listings (pulled from IDX), manually add/edit Schell community details
-- [ ] **AGENT-04**: CRM-lite: contact list with pipeline stage (Lead → Nurturing → Active → Under Contract → Closed), notes, last contact date
-- [ ] **AGENT-05**: Lead capture inbox: all contact form submissions, valuation requests, tour bookings, pre-qual completions
-- [ ] **AGENT-06**: Notification system: new offers, new leads, status changes via email (Resend) + SMS (Twilio)
-- [ ] **AGENT-07**: Site analytics dashboard: listing page views, lead sources, saved search counts, offer conversion rate
-
-### 3D Virtual Tours
-
-- [ ] **TOUR-01**: Matterport embed API integrated — 3D tour embedded on listing detail pages where tour exists
-- [ ] **TOUR-02**: Tour scheduling / showing request form on listings without Matterport (books into agent calendar)
-- [ ] **TOUR-03**: CloudPano fallback support for non-Matterport virtual tours
-
-### SEO & Performance
-
-- [ ] **SEO-01**: Sitemap auto-generated from all active IDX listing pages + community pages
-- [ ] **SEO-02**: Open Graph + Twitter Card meta per listing (photo, price, address)
-- [ ] **SEO-03**: robots.txt configured per Bright MLS IDX display rules
-- [ ] **SEO-04**: Blog/content section for agent to publish local market updates (SEO long-tail)
-- [ ] **SEO-05**: Schema markup for LocalBusiness (agent) + RealEstateListing
+- ✓ **SCHELL-01**: Dedicated community showcase with individual page per Schell Brothers neighborhood — Phase 3
+- ✓ **SCHELL-02**: Community pages: hero, overview, amenities, schools, HOA info, price range, floorplans — Phase 3
+- ✓ **SCHELL-03**: YouTube video embeds + custom video URL support — Phase 3
+- ✓ **SCHELL-04**: Live listings filtered to each community displayed inline — Phase 3
+- ✓ **SCHELL-05**: Interactive community map with POI (schools, restaurants, highways) — Phase 3
+- ✓ **SCHELL-06**: Community pages SEO-optimized (JSON-LD, OG images, sitemap) — Phase 3
+- ✓ **SCHELL-07**: Schedule a Tour CTA on every community page — Phase 3
 
 ---
 
-## v2 Requirements
+## v1.1 Requirements (Milestone: Delaware Search Platform)
 
-### Advanced Features (Post-Launch)
+### MLS Data Pipeline
 
-- **ADV-01**: Rocket Mortgage Partner API upgrade (deeper pre-approval integration)
-- **ADV-02**: iGUIDE integration as Matterport alternative
-- **ADV-03**: AI-powered listing description generator for agent's own listings
-- **ADV-04**: Multi-agent/team expansion (brokerage site mode)
-- **ADV-05**: In-app buyer-agent secure messaging (Compass One-style)
-- **ADV-06**: Video walkthrough recording tool for agent (Loom-style)
-- **ADV-07**: Automated CMA (Comparative Market Analysis) report generator for sellers
+- [ ] **MLS-01**: SimplyRETS sync uses offset-loop pagination to retrieve all Delaware listings (4k-8k), not just the first 500 per request
+- [ ] **MLS-02**: Listing sync runs every 15 minutes using `lastModified` delta for efficiency; full re-sync runs nightly
+- [ ] **MLS-03**: Listing cards display photo, price, beds/baths/sqft, days on market, address, and Bright MLS attribution on every card
+- [ ] **MLS-04**: Individual listing detail pages with full photo gallery, property details, and contact form routing exclusively to dad
+- [ ] **MLS-05**: MLS compliance on every listing page: Bright MLS copyright line, Fair Housing logo, `providedBy` attribution per `src/lib/constants/mls.ts`
+- [ ] **MLS-06**: Coming Soon listings displayed with status badge (subject to SimplyRETS live feed confirmation)
+
+### Structured Search
+
+- [ ] **SEARCH-01**: Filter bar with price range, beds, baths, and property type — persistable via nuqs URL params
+- [ ] **SEARCH-02**: City and zip/area filter for Delaware locations — maps to SimplyRETS `cities` and `postalCodes` params
+- [ ] **SEARCH-03**: Mapbox map view with WebGL-rendered listing pins and supercluster clustering (handles 5k+ pins without degradation)
+- [ ] **SEARCH-04**: Sort dropdown: price (low/high), newest listings, days on market
+
+### AI Chat Search
+
+- [ ] **CHAT-01**: POST `/api/chat/search` Route Handler using Vercel AI SDK v4 `streamText` + tool calling — Claude translates NL query to `SearchParams` JSON, never sees or narrates listing data
+- [ ] **CHAT-02**: Floating chat bubble on every page (fixed-position) — navigates to `/search` with query pre-filled; auto-hides on `/search` route
+- [ ] **CHAT-03**: Dedicated `/search` page with split-pane layout: chat sidebar (left) + map/grid results (right)
+- [ ] **CHAT-04**: When search returns zero results, Claude suggests refinements to broaden the query (e.g., expand price range, try adjacent city)
+- [ ] **CHAT-05**: Chat session token controls: history trimmed to last 6 messages, `max_tokens: 300` for filter translation, rate limit 5 req/min per user
+
+### Lead Routing & Agent
+
+- [ ] **LEAD-01**: Every listing contact form (MLS listings + Schell communities) routes exclusively to dad via Resend email + Twilio SMS; `AGENT_EMAIL` hard-fails at startup if unset
+- [ ] **LEAD-02**: Each lead record tagged with source: `ai_chat`, `map_click`, `filter_search`, `community_page`, or `direct`
+- [ ] **LEAD-03**: Agent dashboard displays all inbound leads with listing context (address, price, source tag, timestamp)
+
+---
+
+## Deferred to v1.2+
+
+### Buyer Accounts
+- **BUYER-01**: Buyer account creation and login via Clerk (email + Google OAuth)
+- **BUYER-02**: Saved listings ("favorites") with persistent list across sessions
+- **BUYER-03**: Saved searches with email + SMS alert notifications
+- **BUYER-04**: Buyer dashboard: favorites, saved searches, offer history
+
+### Market Analytics
+- **MKT-01**: Attom Data API integration — neighborhood market stats
+- **MKT-02**: Comparable sales (comps) on listing detail pages
+- **MKT-03**: Seller home valuation / AVM tool
+
+### Mortgage & Offers
+- **MORT-01**: Morty mortgage pre-qual widget
+- **OFFER-01–08**: Full DocuSign e-sign offer pipeline
+
+### Virtual Tours
+- **TOUR-01**: Matterport 3D tour embeds
+- **TOUR-02**: CloudPano fallback
 
 ---
 
@@ -125,11 +89,13 @@
 
 | Feature | Reason |
 |---------|--------|
-| Rental listings | Sales-only platform; separate IDX license needed |
-| In-house title/escrow | Handled by existing broker pipeline |
-| Multi-brokerage listings (non-Bright MLS) | Single MLS feed sufficient for DE/MD/NJ/PA |
-| Mobile native app (iOS/Android) | Mobile-first PWA sufficient for v1 |
+| Rental listings | Sales-only platform |
+| Multi-brokerage listings | Single Bright MLS feed sufficient |
+| Mobile native app | Mobile-first PWA sufficient |
 | Property management | Out of agent's service scope |
+| AI narrating listing details | Hallucination liability — Claude outputs filters only, Supabase fetches listings |
+| Infinite scroll | Breaks SEO and bookmarkable URLs — pagination only |
+| AI recommendations from behavior | Deferred to v1.2 after buyer accounts exist |
 
 ---
 
@@ -137,23 +103,20 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01–06 | Phase 1 | Pending |
-| DS-01–05 | Phase 1 | Pending |
-| IDX-01–10 | Phase 2 | Pending |
-| SCHELL-01–07 | Phase 3 | Pending |
-| BUYER-01–08 | Phase 4 | Pending |
-| MKT-01–05 | Phase 5 | Pending |
-| MORT-01–03 | Phase 6 | Pending |
-| OFFER-01–08 | Phase 7 | Pending |
-| AGENT-01–07 | Phase 8 | Pending |
-| TOUR-01–03 | Phase 9 | Pending |
-| SEO-01–05 | Phase 10 | Pending |
+| INFRA-01,02,03,06 | Phase 1 (v1.0) | Complete |
+| DS-01,02,03 | Phase 1 (v1.0) | Complete |
+| SCHELL-01–07 | Phase 3 (v1.0) | Complete |
+| MLS-01,02 | Phase 4 | Pending |
+| MLS-03,04,05,06 | Phase 4 | Pending |
+| SEARCH-01,02,03,04 | Phase 5 | Pending |
+| CHAT-01,02,03,04,05 | Phase 6 | Pending |
+| LEAD-01,02,03 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 66 total
-- Mapped to phases: 66
+- v1.1 requirements: 19 total
+- Mapped to phases: 19
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-06*
-*Last updated: 2026-04-06 after initial definition*
+*Last updated: 2026-04-19 after milestone v1.1 definition*
