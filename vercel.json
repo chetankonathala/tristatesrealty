@@ -14,7 +14,11 @@
   ],
   "crons": [
     {
-      "path": "/api/listings/sync",
+      "path": "/api/listings/sync?mode=delta",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/listings/sync?mode=full",
       "schedule": "0 3 * * *"
     },
     {
