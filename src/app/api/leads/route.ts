@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createLead } from "@/lib/supabase/queries/leads";
 import { sendNewLeadAlert } from "@/lib/notifications/resend";
+import { sendNewLeadSms } from "@/lib/notifications/twilio";
 
 const createLeadSchema = z.object({
   name: z.string().min(1).max(100),
@@ -47,6 +48,15 @@ export async function POST(req: Request) {
       listing_url: lead.listing_url,
     }).catch((err) => {
       console.error("[leads] email notification failed:", err);
+    });
+
+    // Fire-and-forget SMS — don't let SMS failure block the response
+    sendNewLeadSms({
+      name: lead.name,
+      listing_address: lead.listing_address,
+      community_name: lead.community_name,
+    }).catch((err) => {
+      console.error("[leads] SMS notification failed:", err);
     });
 
     return NextResponse.json({ id: lead.id }, { status: 201 });
