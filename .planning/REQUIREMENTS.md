@@ -34,10 +34,10 @@
 
 - [x] **MLS-01**: SimplyRETS sync uses offset-loop pagination to retrieve all Delaware listings (4k-8k), not just the first 500 per request
 - [x] **MLS-02**: Listing sync runs every 15 minutes using `lastModified` delta for efficiency; full re-sync runs nightly
-- [ ] **MLS-03**: Listing cards display photo, price, beds/baths/sqft, days on market, address, and Bright MLS attribution on every card
+- [x] **MLS-03**: Listing cards display photo, price, beds/baths/sqft, days on market, address, and Bright MLS attribution on every card
 - [ ] **MLS-04**: Individual listing detail pages with full photo gallery, property details, and contact form routing exclusively to dad
-- [ ] **MLS-05**: MLS compliance on every listing page: Bright MLS copyright line, Fair Housing logo, `providedBy` attribution per `src/lib/constants/mls.ts`
-- [ ] **MLS-06**: Coming Soon listings displayed with status badge (subject to SimplyRETS live feed confirmation)
+- [x] **MLS-05**: MLS compliance on every listing page: Bright MLS copyright line, Fair Housing logo, `providedBy` attribution per `src/lib/constants/mls.ts`
+- [x] **MLS-06**: Coming Soon listings displayed with status badge (subject to SimplyRETS live feed confirmation)
 
 ### Structured Search
 

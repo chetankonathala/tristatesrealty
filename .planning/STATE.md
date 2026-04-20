@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Delaware Search Platform
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-20T19:33:03.748Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-20T19:36:46.479Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 33
+  completed_plans: 2
+  percent: 67
 ---
 
 # State: Tri States Realty
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 ## Current Position
 
 Phase: 04 (mls-data-pipeline) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 **Milestone:** v1.1 — Delaware Search Platform
 **Status:** Ready to execute
 **Last activity:** 2026-04-20
@@ -76,6 +76,9 @@ Plan 01-01 complete:
 - [Phase 03]: buttonVariants() on Link for CTA: base-ui Button lacks asChild, CVA function exported from button.tsx achieves identical result
 - [Phase 04]: Default sync mode is delta (not full) — safer for frequent 15-min cron calls
 - [Phase 04]: Stale listing closure (mark as Closed) only runs in full mode — delta never closes listings
+- [Phase 04]: MlsAttribution compact mode renders single copyright line only (no logos) for search results footer
+- [Phase 04]: Days on market: <=7 days shows New label, >7 shows numeric count
+- [Phase 04]: Coming Soon badge uses blue (bg-blue-500) matching status dot color
 
 ## Performance Metrics
 
@@ -87,11 +90,12 @@ Plan 01-01 complete:
 | Phase 03 P03 | 4min | 2 tasks | 6 files |
 | Phase 03 P04 | 3min | 3 tasks | 5 files |
 | Phase 04 P01 | 2min | 2 tasks | 3 files |
+| Phase 04 P02 | 3min | 3 tasks | 5 files |
 
 ## Session
 
-- **Last session:** 2026-04-20T19:33:03.746Z
-- **Stopped at:** Completed 04-01-PLAN.md
+- **Last session:** 2026-04-20T19:36:46.477Z
+- **Stopped at:** Completed 04-02-PLAN.md
 
 ## Blockers
 

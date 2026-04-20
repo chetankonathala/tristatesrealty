@@ -101,7 +101,7 @@ Plans:
 
 Plans:
 - [x] 04-01-PLAN.md — Fix sync route + delta/full mode + ComingSoon status + cron config
-- [ ] 04-02-PLAN.md — ListingCard enhancements (DOM, attribution, Coming Soon badge) + MlsAttribution refactor
+- [x] 04-02-PLAN.md — ListingCard enhancements (DOM, attribution, Coming Soon badge) + MlsAttribution refactor
 - [ ] 04-03-PLAN.md — Add Twilio SMS to lead notification flow + AGENT_PHONE env var
 
 #### Phase 5: Structured Search
@@ -163,7 +163,7 @@ Plans:
 | 1. Foundation & Design System | v1.0 | 8/8 | Complete | 2026-04-18 |
 | 2. IDX Listings Engine | v1.0 | 11/11 | Complete | 2026-04-18 |
 | 3. Schell Brothers Communities | v1.0 | 5/5 | Complete | 2026-04-18 |
-| 4. MLS Data Pipeline | v1.1 | 1/3 | In Progress|  |
+| 4. MLS Data Pipeline | v1.1 | 2/3 | In Progress|  |
 | 5. Structured Search | v1.1 | 0/4 | Not started | - |
 | 6. AI Chat Search | v1.1 | 0/5 | Not started | - |
 | 7. Lead Routing & Agent Dashboard | v1.1 | 0/3 | Not started | - |
