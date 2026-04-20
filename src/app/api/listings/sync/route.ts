@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { syncSchellListings } from "@/lib/schell/sync";
+import { syncListings } from "@/lib/simplyrets/sync";
 
 export const runtime = "nodejs";
-export const maxDuration = 300; // 5 min — scraping ~20 communities takes ~30s
+export const maxDuration = 300; // 5 min — full paginated sync across all DE listings
 
 export async function POST(req: Request) {
   // Auth: Vercel Cron sets `Authorization: Bearer ${CRON_SECRET}`
@@ -12,9 +12,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const url = new URL(req.url);
+  const mode = (url.searchParams.get("mode") ?? "delta") as "delta" | "full";
+
   try {
-    const result = await syncSchellListings();
-    return NextResponse.json({ ok: true, ...result });
+    const result = await syncListings({ mode });
+    return NextResponse.json({ ok: true, mode, ...result });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Sync failed";
     console.error("[sync] failed:", message);
