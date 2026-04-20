@@ -5,6 +5,7 @@ import { SearchFilters } from "@/components/listings/search-filters";
 import { ActiveFilterBar } from "@/components/listings/active-filter-bar";
 import { SearchResultsHeader } from "@/components/listings/search-results-header";
 import { SearchResultsGrid } from "@/components/listings/search-results-grid";
+import { MlsAttribution } from "@/components/listings/mls-attribution";
 
 export const metadata: Metadata = {
   title: "New Homes for Sale in Delaware | Schell Brothers | Tri States Realty",
@@ -40,6 +41,13 @@ export default async function ListingsPage({ searchParams }: PageProps) {
       <ActiveFilterBar />
       <SearchResultsHeader totalCount={result.totalCount} locationLabel={locationLabel} />
       <SearchResultsGrid listings={result.listings} totalCount={result.totalCount} />
+      <MlsAttribution
+        compact
+        listingOfficeName={null}
+        listingAgentName={null}
+        listingAgentPhone={null}
+        syncedAt={new Date().toISOString()}
+      />
     </main>
   );
 }
