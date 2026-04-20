@@ -71,4 +71,5 @@ export interface ListingSummary {
   list_date: string | null;
   days_on_market: number | null;
   open_house_date: string | null;
+  listing_office_name: string | null;
 }

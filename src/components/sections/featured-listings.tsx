@@ -20,6 +20,7 @@ const PLACEHOLDER_LISTINGS: ListingSummary[] = [
     list_date: null,
     days_on_market: null,
     open_house_date: null,
+    listing_office_name: null,
   },
   {
     mls_id: 1002,
@@ -37,6 +38,7 @@ const PLACEHOLDER_LISTINGS: ListingSummary[] = [
     list_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     days_on_market: 3,
     open_house_date: null,
+    listing_office_name: null,
   },
   {
     mls_id: 1003,
@@ -54,6 +56,7 @@ const PLACEHOLDER_LISTINGS: ListingSummary[] = [
     list_date: null,
     days_on_market: null,
     open_house_date: null,
+    listing_office_name: null,
   },
   {
     mls_id: 1004,
@@ -71,6 +74,7 @@ const PLACEHOLDER_LISTINGS: ListingSummary[] = [
     list_date: null,
     days_on_market: null,
     open_house_date: null,
+    listing_office_name: null,
   },
   {
     mls_id: 1005,
@@ -88,6 +92,7 @@ const PLACEHOLDER_LISTINGS: ListingSummary[] = [
     list_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     days_on_market: 2,
     open_house_date: null,
+    listing_office_name: null,
   },
   {
     mls_id: 1006,
@@ -105,6 +110,7 @@ const PLACEHOLDER_LISTINGS: ListingSummary[] = [
     list_date: null,
     days_on_market: null,
     open_house_date: null,
+    listing_office_name: null,
   },
 ]
 

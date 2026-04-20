@@ -33,7 +33,9 @@ export function ListingCard({
       ? "bg-green-500"
       : listing.status === "Pending" || listing.status === "ActiveUnderContract"
         ? "bg-[#F59E0B]"
-        : "bg-muted-foreground";
+        : listing.status === "ComingSoon"
+          ? "bg-blue-500"
+          : "bg-muted-foreground";
 
   const handleSaveClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -96,7 +98,7 @@ export function ListingCard({
           </span>
         )}
         {/* Badges */}
-        {(isNew || listing.status === "Pending") && (
+        {(isNew || listing.status === "Pending" || listing.status === "ComingSoon") && (
           <div className="absolute top-3 left-9 flex gap-1.5">
             {isNew && (
               <span className="rounded-sm bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-background">
@@ -106,6 +108,11 @@ export function ListingCard({
             {listing.status === "Pending" && (
               <span className="rounded-sm bg-[#F59E0B] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-background">
                 PENDING
+              </span>
+            )}
+            {listing.status === "ComingSoon" && (
+              <span className="rounded-sm bg-blue-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                COMING SOON
               </span>
             )}
           </div>
@@ -119,6 +126,20 @@ export function ListingCard({
         <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
           {listing.bedrooms ?? "—"} bd · {listing.bathrooms ?? "—"} ba ·{" "}
           {listing.area?.toLocaleString() ?? "—"} sqft
+        </div>
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>
+            {listing.days_on_market !== null && listing.days_on_market <= 7
+              ? "New"
+              : listing.days_on_market !== null
+                ? `${listing.days_on_market} days`
+                : ""}
+          </span>
+          {listing.listing_office_name && (
+            <span className="truncate ml-2 max-w-[60%] text-right">
+              {listing.listing_office_name}
+            </span>
+          )}
         </div>
       </div>
     </Link>
