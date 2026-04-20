@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: completed
-stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-04-18T13:42:45.135Z"
-last_activity: 2026-04-18
+milestone: v1.1
+milestone_name: Delaware Search Platform
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-04-20T19:33:03.748Z"
+last_activity: 2026-04-20
 progress:
-  total_phases: 3
-  completed_phases: 2
-  total_plans: 24
-  completed_plans: 18
-  percent: 75
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 3
+  completed_plans: 1
+  percent: 33
 ---
 
 # State: Tri States Realty
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** Buyers complete the entire home-buying journey on one site while the agent earns commission hands-free.
-**Current focus:** Phase 03 — schell-brothers-communities
+**Current focus:** Phase 04 — mls-data-pipeline
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
+Phase: 04 (mls-data-pipeline) — EXECUTING
+Plan: 2 of 3
 **Milestone:** v1.1 — Delaware Search Platform
-**Status:** Defining requirements
-**Last activity:** 2026-04-19 — Milestone v1.1 started
+**Status:** Ready to execute
+**Last activity:** 2026-04-20
 
 ## Phase Progress
 
@@ -74,6 +74,8 @@ Plan 01-01 complete:
 - [Phase 03]: CommunityFloorPlans prefixes all external links with https://www.schellbrothers.com to prevent T-03-08 external link injection
 - [Phase 03]: Native date input used in ScheduleTourModal instead of shadcn Calendar — avoids react-day-picker dep, better mobile UX, dark theme via [color-scheme:dark]
 - [Phase 03]: buttonVariants() on Link for CTA: base-ui Button lacks asChild, CVA function exported from button.tsx achieves identical result
+- [Phase 04]: Default sync mode is delta (not full) — safer for frequent 15-min cron calls
+- [Phase 04]: Stale listing closure (mark as Closed) only runs in full mode — delta never closes listings
 
 ## Performance Metrics
 
@@ -84,11 +86,12 @@ Plan 01-01 complete:
 | Phase 03 P02 | 8min | 2 tasks | 3 files |
 | Phase 03 P03 | 4min | 2 tasks | 6 files |
 | Phase 03 P04 | 3min | 3 tasks | 5 files |
+| Phase 04 P01 | 2min | 2 tasks | 3 files |
 
 ## Session
 
-- **Last session:** 2026-04-18T12:58:57.409Z
-- **Stopped at:** Completed 03-05-PLAN.md
+- **Last session:** 2026-04-20T19:33:03.746Z
+- **Stopped at:** Completed 04-01-PLAN.md
 
 ## Blockers
 
