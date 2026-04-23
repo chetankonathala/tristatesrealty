@@ -9,10 +9,10 @@ import { NavLink } from "./nav-link"
 import { MobileMenu } from "./mobile-menu"
 
 const NAV_LINKS = [
-  { href: "/", label: "Properties" },
-  { href: "/", label: "Communities" },
-  { href: "/", label: "About" },
-  { href: "/", label: "Contact" },
+  { href: "/listings", label: "Properties" },
+  { href: "/communities", label: "Communities" },
+  { href: "/#about", label: "About" },
+  { href: "/#contact", label: "Contact" },
 ]
 
 export function Navbar() {
