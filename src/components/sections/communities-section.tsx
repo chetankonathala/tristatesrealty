@@ -25,7 +25,7 @@ const PLACEHOLDER_COMMUNITIES = [
 
 export function CommunitiesSection() {
   return (
-    <section className="pt-16 md:pt-[64px] pb-16 bg-card/30">
+    <section id="about" className="pt-16 md:pt-[64px] pb-16 bg-card/30">
       <div className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-8">
         <FadeIn>
           <h2 className="font-display text-[28px] font-bold text-foreground">

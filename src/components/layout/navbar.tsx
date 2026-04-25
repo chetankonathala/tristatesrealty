@@ -51,9 +51,9 @@ export function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden md:block">
-            <Button variant="ghost" className="border border-accent text-accent hover:bg-accent hover:text-accent-foreground">
+            <a href="/#contact" className="inline-flex items-center justify-center rounded-md border border-accent px-4 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent hover:text-background">
               Contact Agent
-            </Button>
+            </a>
           </div>
 
           {/* Mobile hamburger */}

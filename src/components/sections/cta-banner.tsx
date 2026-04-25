@@ -3,7 +3,7 @@ import { FadeIn } from "@/components/motion/fade-in"
 
 export function CTABanner() {
   return (
-    <section className="bg-accent-muted">
+    <section id="contact" className="bg-accent-muted">
       <div className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-8 py-16 text-center">
         <FadeIn>
           <h2 className="font-display text-[28px] md:text-[36px] font-bold text-foreground">
@@ -13,9 +13,9 @@ export function CTABanner() {
             Let us help you navigate the market with expert guidance and cutting-edge tools.
           </p>
           <div className="mt-8">
-            <Button variant="default" size="lg">
+            <a href="mailto:tristatesrealtyde@gmail.com" className="inline-flex items-center justify-center rounded-md bg-accent px-6 py-3 text-base font-semibold text-background hover:bg-accent/90 transition-colors">
               Contact Agent
-            </Button>
+            </a>
           </div>
         </FadeIn>
       </div>
