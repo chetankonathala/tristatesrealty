@@ -23,7 +23,11 @@ Any Delaware home buyer can find their perfect home and contact the agent in und
 
 ### Validated
 
-(None yet — ship to validate)
+**MLS Data** *(Validated in Phase 04: MLS Data Pipeline)*
+- [x] Listing cards: photo, price, beds/baths/sqft, days on market, address, MLS attribution
+- [x] Individual listing detail pages with full photo gallery and contact form routing to dad
+- [x] Every listing contact form routes exclusively to dad (email + SMS via Resend + Twilio)
+- [x] Bright MLS compliance on every listing surface (copyright, Fair Housing logo, providedBy attribution)
 
 ### Active (v1.1 — Delaware Search Platform)
 
@@ -97,4 +101,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-19 after milestone v1.1 start*
+*Last updated: 2026-04-25 after Phase 04 (MLS Data Pipeline) complete*
