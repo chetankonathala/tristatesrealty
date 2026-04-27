@@ -1,10 +1,11 @@
 ---
 phase: 5
 slug: structured-search
-status: draft
+status: approved
 shadcn_initialized: true
 preset: base-nova
 created: 2026-04-27
+reviewed_at: 2026-04-27
 ---
 
 # Phase 5 — UI Design Contract
