@@ -5,7 +5,7 @@ import type { SearchParams } from "@/lib/schemas/search-params";
 import { parseBounds, parseMultiValue } from "@/lib/schemas/search-params";
 
 const SUMMARY_FIELDS =
-  "mls_id,list_price,status,address_full,address_city,address_state,bedrooms,bathrooms,area,photos,lat,lng,list_date,days_on_market,open_house_date";
+  "mls_id,list_price,status,address_full,address_city,address_state,bedrooms,bathrooms,area,photos,lat,lng,list_date,days_on_market,open_house_date,listing_office_name";
 
 export interface SearchResult {
   listings: ListingSummary[];

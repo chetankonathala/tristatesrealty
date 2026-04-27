@@ -12,6 +12,7 @@ import { SignInRequiredModal } from "@/components/listings/sign-in-required-moda
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://tristatesrealty.com"),
   title: "Tri States Realty | Luxury Homes in DE, MD, NJ & PA",
   description: "Find your dream home across Delaware, Maryland, New Jersey, and Pennsylvania. Luxury real estate with virtual tours, market analytics, and seamless offers.",
 };
