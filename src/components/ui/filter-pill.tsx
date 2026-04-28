@@ -2,18 +2,15 @@
 
 import { cn } from "@/lib/utils"
 
-interface FilterPillProps {
+interface FilterPillProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   selected?: boolean
-  onClick?: () => void
-  children: React.ReactNode
   className?: string
 }
 
-export function FilterPill({ selected = false, onClick, children, className }: FilterPillProps) {
+export function FilterPill({ selected = false, children, className, ...rest }: FilterPillProps) {
   return (
     <button
       type="button"
-      onClick={onClick}
       className={cn(
         "h-9 px-4 rounded-full text-sm font-medium transition-colors",
         "border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -22,6 +19,7 @@ export function FilterPill({ selected = false, onClick, children, className }: F
           : "bg-muted text-foreground border-border hover:border-border-hover",
         className
       )}
+      {...rest}
     >
       {children}
     </button>

@@ -5,6 +5,7 @@ import { useQueryState, parseAsStringEnum } from "nuqs";
 import { ListingCard } from "@/components/cards/listing-card";
 import { ListingCardSkeleton } from "./listing-card-skeleton";
 import { EmptyState } from "./empty-state";
+import { SearchPagination } from "./search-pagination";
 import { Button } from "@/components/ui/button";
 import { Map as MapIcon, List as ListIcon } from "lucide-react";
 import type { ListingSummary } from "@/types/listing";
@@ -27,18 +28,20 @@ export function SearchResultsGrid({ listings, totalCount }: SearchResultsGridPro
   if (listings.length === 0) return <EmptyState variant="no-results" />;
 
   const cardGrid = (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-      {listings.map((listing) => (
-        <ListingCard
-          key={listing.mls_id}
-          listing={listing}
-          highlighted={selectedMlsId === listing.mls_id}
-          onRequireSignIn={() => {
-            // Wired up in plan 02-09 SignInRequiredModal
-            window.dispatchEvent(new CustomEvent("require-sign-in"));
-          }}
-        />
-      ))}
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+        {listings.map((listing) => (
+          <ListingCard
+            key={listing.mls_id}
+            listing={listing}
+            highlighted={selectedMlsId === listing.mls_id}
+            onRequireSignIn={() => {
+              window.dispatchEvent(new CustomEvent("require-sign-in"));
+            }}
+          />
+        ))}
+      </div>
+      <SearchPagination totalCount={totalCount} />
     </div>
   );
 

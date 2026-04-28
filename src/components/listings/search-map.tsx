@@ -17,7 +17,7 @@ interface SearchMapProps {
 
 export function SearchMap({ listings, selectedMlsId, onSelect, initialViewState }: SearchMapProps) {
   const mapRef = useRef<MapRef | null>(null);
-  const [, setBounds] = useQueryState("bounds", parseAsString);
+  const [boundsParam, setBounds] = useQueryState("bounds", parseAsString);
   const [viewState, setViewState] = useState(
     initialViewState ?? { longitude: -75.5277, latitude: 39.0, zoom: 7 }
   );
@@ -61,16 +61,23 @@ export function SearchMap({ listings, selectedMlsId, onSelect, initialViewState 
     setViewState(e.viewState);
   }, [setBounds]);
 
-  // Init bounds on first map load
+  // Init bounds on first map load; restore viewport if bounds param present (D-12)
   const handleLoad = useCallback(() => {
     const map = mapRef.current?.getMap();
     if (!map) return;
+    if (boundsParam) {
+      const parts = boundsParam.split(",").map(Number);
+      if (parts.length === 4 && parts.every((n) => !isNaN(n))) {
+        const [swLng, swLat, neLng, neLat] = parts;
+        map.fitBounds([[swLng, swLat], [neLng, neLat]], { padding: 20, duration: 0 });
+      }
+    }
     const b = map.getBounds();
     if (!b) return;
     const sw = b.getSouthWest();
     const ne = b.getNorthEast();
     setMapBounds([sw.lng, sw.lat, ne.lng, ne.lat]);
-  }, []);
+  }, [boundsParam]);
 
   // Fly to selected listing (D-04 marker → card sync)
   useEffect(() => {

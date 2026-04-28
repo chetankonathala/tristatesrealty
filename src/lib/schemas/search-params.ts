@@ -45,7 +45,7 @@ export const searchParamsSchema = z.object({
   status: z.enum(["Active", "Pending", "ActiveUnderContract", "ComingSoon"]).optional(),
 
   // Sort + pagination
-  sort: z.enum(["price-asc", "price-desc", "date-desc", "date-asc", "beds-desc", "sqft-desc"]).default("date-desc"),
+  sort: z.enum(["price-asc", "price-desc", "date-desc", "date-asc", "beds-desc", "sqft-desc", "dom-asc"]).default("date-desc"),
   page: z.coerce.number().int().min(1).default(1),
   perPage: z.coerce.number().int().min(1).max(100).default(24),
 

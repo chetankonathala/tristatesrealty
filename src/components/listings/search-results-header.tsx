@@ -10,7 +10,7 @@ interface SearchResultsHeaderProps {
 export function SearchResultsHeader({ totalCount, locationLabel }: SearchResultsHeaderProps) {
   const [sort, setSort] = useQueryState(
     "sort",
-    parseAsStringEnum(["price-asc", "price-desc", "date-desc", "date-asc", "beds-desc", "sqft-desc"]).withDefault("date-desc")
+    parseAsStringEnum(["price-asc", "price-desc", "date-desc", "date-asc", "beds-desc", "sqft-desc", "dom-asc"]).withDefault("date-desc")
   );
 
   const headline = locationLabel
@@ -33,6 +33,7 @@ export function SearchResultsHeader({ totalCount, locationLabel }: SearchResults
           <option value="price-asc">Price: Low to High</option>
           <option value="beds-desc">Most Bedrooms</option>
           <option value="sqft-desc">Largest Sqft</option>
+          <option value="dom-asc">Days on Market</option>
         </select>
         <ViewToggle />
       </div>

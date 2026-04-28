@@ -95,6 +95,9 @@ export async function searchListings(params: SearchParams): Promise<SearchResult
     case "sqft-desc":
       query = query.order("area", { ascending: false });
       break;
+    case "dom-asc":
+      query = query.order("days_on_market", { ascending: true, nullsFirst: false });
+      break;
     case "date-desc":
     default:
       query = query.order("list_date", { ascending: false });
