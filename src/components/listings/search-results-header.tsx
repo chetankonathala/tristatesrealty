@@ -5,9 +5,10 @@ import { ViewToggle } from "./view-toggle";
 interface SearchResultsHeaderProps {
   totalCount: number;
   locationLabel?: string;
+  leftSlot?: React.ReactNode;
 }
 
-export function SearchResultsHeader({ totalCount, locationLabel }: SearchResultsHeaderProps) {
+export function SearchResultsHeader({ totalCount, locationLabel, leftSlot }: SearchResultsHeaderProps) {
   const [sort, setSort] = useQueryState(
     "sort",
     parseAsStringEnum(["price-asc", "price-desc", "date-desc", "date-asc", "beds-desc", "sqft-desc", "dom-asc"]).withDefault("date-desc")
@@ -19,7 +20,10 @@ export function SearchResultsHeader({ totalCount, locationLabel }: SearchResults
 
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-3">
-      <h2 className="text-base font-bold">{headline}</h2>
+      <div className="flex items-center gap-3 min-w-0">
+        {leftSlot}
+        <h2 className="text-base font-bold truncate">{headline}</h2>
+      </div>
       <div className="flex items-center gap-3">
         <label className="text-xs uppercase tracking-wider text-muted-foreground">Sort by</label>
         <select

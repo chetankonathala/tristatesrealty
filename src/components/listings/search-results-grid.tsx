@@ -59,7 +59,7 @@ export function SearchResultsGrid({ listings, totalCount }: SearchResultsGridPro
     <>
       {/* Desktop: D-01 split layout (map right 40%, list left 60%) */}
       <div
-        className="hidden lg:grid h-[calc(100vh-12rem)]"
+        className="hidden lg:grid h-full"
         style={{
           gridTemplateColumns:
             view === "split" ? "60% 40%" : view === "list" ? "100% 0%" : "0% 100%",

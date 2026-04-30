@@ -1,0 +1,50 @@
+import {
+  parseAsBoolean,
+  parseAsInteger,
+  parseAsString,
+  parseAsStringEnum,
+} from "nuqs";
+
+export const searchParamParsers = {
+  minPrice: parseAsInteger,
+  maxPrice: parseAsInteger,
+  minBeds: parseAsInteger,
+  maxBeds: parseAsInteger,
+  minBaths: parseAsInteger,
+  maxBaths: parseAsInteger,
+  minSqft: parseAsInteger,
+  maxSqft: parseAsInteger,
+  minLotSize: parseAsInteger,
+  maxLotSize: parseAsInteger,
+  minYearBuilt: parseAsInteger,
+  type: parseAsString,
+  cities: parseAsString,
+  counties: parseAsString,
+  postalCodes: parseAsString,
+  state: parseAsStringEnum(["DE", "MD", "NJ", "PA"] as const),
+  schoolDistrict: parseAsString,
+  waterfront: parseAsBoolean,
+  newConstruction: parseAsBoolean,
+  garage: parseAsBoolean,
+  status: parseAsStringEnum([
+    "Active",
+    "Pending",
+    "ActiveUnderContract",
+    "ComingSoon",
+  ] as const),
+  sort: parseAsStringEnum([
+    "price-asc",
+    "price-desc",
+    "date-desc",
+    "date-asc",
+    "beds-desc",
+    "sqft-desc",
+    "dom-asc",
+  ] as const),
+  page: parseAsInteger,
+  perPage: parseAsInteger,
+  view: parseAsStringEnum(["map", "list", "split"] as const),
+  bounds: parseAsString,
+};
+
+export type SearchParamParsers = typeof searchParamParsers;

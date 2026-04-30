@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Navbar, Footer } from "@/components/layout"
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { SignInRequiredModal } from "@/components/listings/sign-in-required-modal";
+import { ChatBubble } from "@/components/chat/chat-bubble";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Footer />
             <ToastProvider />
             <SignInRequiredModal />
+            <ChatBubble />
           </NuqsAdapter>
         </ClerkProvider>
       </body>

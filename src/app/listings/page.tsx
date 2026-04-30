@@ -3,18 +3,16 @@ import { searchListings } from "@/lib/supabase/queries/listings";
 import { parseSearchParams } from "@/lib/schemas/search-params";
 import { SearchFilters } from "@/components/listings/search-filters";
 import { ActiveFilterBar } from "@/components/listings/active-filter-bar";
-import { SearchResultsHeader } from "@/components/listings/search-results-header";
-import { SearchResultsGrid } from "@/components/listings/search-results-grid";
+import { ListingsShell } from "@/components/listings/listings-shell";
 import { MlsAttribution } from "@/components/listings/mls-attribution";
 
 export const metadata: Metadata = {
-  title: "New Homes for Sale in Delaware | Schell Brothers | Tri States Realty",
+  title: "Homes for Sale in Delaware | Tri States Realty",
   description:
-    "Browse Schell Brothers new construction communities across Delaware. Find your perfect floor plan in Lewes, Millsboro, Middletown, and more.",
+    "Search all Delaware MLS listings — filter by price, beds, baths, and location, or ask our AI assistant in plain English.",
 };
 
-// Revalidated nightly by the Schell sync cron job
-export const revalidate = 86400; // 24 hr fallback
+export const revalidate = 900; // 15 min — matches delta sync cadence
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -39,8 +37,11 @@ export default async function ListingsPage({ searchParams }: PageProps) {
     <main className="min-h-screen bg-background">
       <SearchFilters />
       <ActiveFilterBar />
-      <SearchResultsHeader totalCount={result.totalCount} locationLabel={locationLabel} />
-      <SearchResultsGrid listings={result.listings} totalCount={result.totalCount} />
+      <ListingsShell
+        listings={result.listings}
+        totalCount={result.totalCount}
+        locationLabel={locationLabel}
+      />
       <MlsAttribution
         compact
         listingOfficeName={null}
