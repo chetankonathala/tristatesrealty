@@ -116,10 +116,10 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: nuqs URL schema expansion for all filter + sort params
-- [ ] 05-02: City/zip/area filter component + SimplyRETS param mapping
-- [ ] 05-03: Mapbox WebGL pin layer + supercluster at 5k+ listing scale
-- [ ] 05-04: Sort dropdown + results count + pagination controls
+- [x] 05-01: nuqs URL schema expansion for all filter + sort params
+- [x] 05-02: City/zip/area filter component + SimplyRETS param mapping
+- [x] 05-03: Mapbox WebGL pin layer + supercluster at 5k+ listing scale
+- [x] 05-04: Sort dropdown + results count + pagination controls
 
 #### Phase 6: AI Chat Search
 **Goal**: Claude-powered NL-to-filters chat with floating bubble site-wide + /search split-pane layout
@@ -134,11 +134,11 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: /api/chat/search route — Vercel AI SDK streamText + SearchParams tool
-- [ ] 06-02: Chat UI component (message list, input, streaming response)
-- [ ] 06-03: Floating chat bubble (site-wide, auto-hide on /search)
-- [ ] 06-04: /search split-pane page layout (chat sidebar + map/grid)
-- [ ] 06-05: Zero-result refinement suggestions + rate limiting + token controls
+- [x] 06-01: /api/chat/search route — Vercel AI SDK streamText + SearchParams tool
+- [x] 06-02: Chat UI component (message list, input, streaming response)
+- [x] 06-03: Floating chat bubble (site-wide, auto-hide on /listings)
+- [x] 06-04: /listings split-pane page layout (chat sidebar + map/grid)
+- [x] 06-05: Zero-result refinement suggestions + rate limiting + token controls
 
 #### Phase 7: Lead Routing & Agent Dashboard
 **Goal**: All listing contact forms route to dad via Resend + Twilio with source tagging; agent dashboard shows all inbound leads
@@ -164,6 +164,6 @@ Plans:
 | 2. IDX Listings Engine | v1.0 | 11/11 | Complete | 2026-04-18 |
 | 3. Schell Brothers Communities | v1.0 | 5/5 | Complete | 2026-04-18 |
 | 4. MLS Data Pipeline | v1.1 | 3/3 | Complete   | 2026-04-20 |
-| 5. Structured Search | v1.1 | 0/4 | Not started | - |
-| 6. AI Chat Search | v1.1 | 0/5 | Not started | - |
+| 5. Structured Search | v1.1 | 4/4 | Complete | 2026-04-27 |
+| 6. AI Chat Search | v1.1 | 5/5 | Complete | 2026-04-30 |
 | 7. Lead Routing & Agent Dashboard | v1.1 | 0/3 | Not started | - |

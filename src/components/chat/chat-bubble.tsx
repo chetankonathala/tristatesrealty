@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { MessageCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChatPanel } from "./chat-panel";
@@ -8,14 +8,12 @@ import { ChatPanel } from "./chat-panel";
 export function ChatBubble() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
 
   // Hide bubble on listings page — chat is embedded there
   if (pathname.startsWith("/listings")) return null;
 
-  // On non-listings pages, closing = navigate to /listings
+  // ChatPanel handles navigation to /listings on its own; we just close the popover
   const handleFiltersApplied = () => {
-    router.push("/listings");
     setOpen(false);
   };
 

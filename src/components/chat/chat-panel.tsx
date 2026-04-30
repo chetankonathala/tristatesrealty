@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useQueryStates } from "nuqs";
@@ -36,6 +37,10 @@ interface ChatPanelProps {
 }
 
 export function ChatPanel({ onFiltersApplied, compact }: ChatPanelProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const onListings = pathname.startsWith("/listings");
+
   const [, setFilters] = useQueryStates(searchParamParsers, {
     shallow: false,
   });
@@ -59,22 +64,45 @@ export function ChatPanel({ onFiltersApplied, compact }: ChatPanelProps) {
         part.state === "output-available"
       ) {
         const p = part.input as SearchInput;
-        setFilters({
-          minPrice: p.minPrice ?? null,
-          maxPrice: p.maxPrice ?? null,
-          minBeds: p.minBeds ?? null,
-          minBaths: p.minBaths ?? null,
-          cities: p.cities ?? null,
-          postalCodes: p.postalCodes ?? null,
-          type: p.type ?? null,
-          waterfront: p.waterfront ?? null,
-          newConstruction: p.newConstruction ?? null,
-          garage: p.garage ?? null,
-          minSqft: p.minSqft ?? null,
-          maxSqft: p.maxSqft ?? null,
-          sort: (p.sort as typeof searchParamParsers.sort extends { withDefault: (v: infer V) => unknown } ? V : never) ?? null,
-          page: null,
-        });
+
+        if (onListings) {
+          // Already on listings page — apply filters via nuqs (server re-renders with new results)
+          setFilters({
+            minPrice: p.minPrice ?? null,
+            maxPrice: p.maxPrice ?? null,
+            minBeds: p.minBeds ?? null,
+            minBaths: p.minBaths ?? null,
+            cities: p.cities ?? null,
+            postalCodes: p.postalCodes ?? null,
+            type: p.type ?? null,
+            waterfront: p.waterfront ?? null,
+            newConstruction: p.newConstruction ?? null,
+            garage: p.garage ?? null,
+            minSqft: p.minSqft ?? null,
+            maxSqft: p.maxSqft ?? null,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            sort: (p.sort as any) ?? null,
+            page: null,
+          });
+        } else {
+          // From any other page — navigate to /listings with params encoded in URL
+          const qs = new URLSearchParams();
+          if (p.minPrice != null) qs.set("minPrice", String(p.minPrice));
+          if (p.maxPrice != null) qs.set("maxPrice", String(p.maxPrice));
+          if (p.minBeds != null) qs.set("minBeds", String(p.minBeds));
+          if (p.minBaths != null) qs.set("minBaths", String(p.minBaths));
+          if (p.cities) qs.set("cities", p.cities);
+          if (p.postalCodes) qs.set("postalCodes", p.postalCodes);
+          if (p.type) qs.set("type", p.type);
+          if (p.waterfront) qs.set("waterfront", "true");
+          if (p.newConstruction) qs.set("newConstruction", "true");
+          if (p.garage) qs.set("garage", "true");
+          if (p.minSqft != null) qs.set("minSqft", String(p.minSqft));
+          if (p.maxSqft != null) qs.set("maxSqft", String(p.maxSqft));
+          if (p.sort) qs.set("sort", p.sort);
+          router.push(`/listings?${qs.toString()}`);
+        }
+
         onFiltersApplied?.();
         break;
       }

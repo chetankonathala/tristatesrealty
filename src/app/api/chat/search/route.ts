@@ -1,4 +1,4 @@
-import { streamText, tool } from "ai";
+import { streamText, tool, convertToModelMessages } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
@@ -114,9 +114,10 @@ export async function POST(req: Request) {
   }
 
   const allMessages = Array.isArray(body.messages) ? body.messages : [];
-  // Trim to last 6 messages (3 turns) to keep context tight
+  // Trim to last 6 UI messages (3 turns) to keep context tight, then convert to ModelMessages for streamText
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const messages = (allMessages.slice(-6) ?? []) as any[];
+  const uiMessages = allMessages.slice(-6) as any[];
+  const messages = await convertToModelMessages(uiMessages);
 
   const result = streamText({
     model: anthropic("claude-sonnet-4-6"),
