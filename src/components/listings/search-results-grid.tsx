@@ -35,6 +35,7 @@ export function SearchResultsGrid({ listings, totalCount }: SearchResultsGridPro
             key={listing.mls_id}
             listing={listing}
             highlighted={selectedMlsId === listing.mls_id}
+            source={selectedMlsId === listing.mls_id ? "map_click" : "filter_search"}
             onRequireSignIn={() => {
               window.dispatchEvent(new CustomEvent("require-sign-in"));
             }}

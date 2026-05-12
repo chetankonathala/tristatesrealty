@@ -18,8 +18,23 @@ import { MlsAttribution } from "@/components/listings/mls-attribution";
 import { ListingJsonLd } from "@/components/listings/listing-jsonld";
 import { MobileDetailStickyBarWrapper } from "./mobile-sticky-wrapper";
 
+import type { LeadSource } from "@/types/lead";
+
 interface PageProps {
   params: Promise<{ mlsId: string }>;
+  searchParams: Promise<{ from?: string }>;
+}
+
+const VALID_SOURCES: ReadonlySet<LeadSource> = new Set([
+  "ai_chat",
+  "map_click",
+  "filter_search",
+  "community_page",
+  "direct",
+]);
+
+function resolveLeadSource(from: string | undefined): LeadSource {
+  return from && VALID_SOURCES.has(from as LeadSource) ? (from as LeadSource) : "direct";
 }
 
 // ISR — sync job (plan 02-02) calls revalidateTag(`listing-${mls_id}`) on changes.
@@ -80,8 +95,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function ListingDetailPage({ params }: PageProps) {
+export default async function ListingDetailPage({ params, searchParams }: PageProps) {
   const { mlsId } = await params;
+  const { from } = await searchParams;
+  const leadSource = resolveLeadSource(from);
   const id = Number(mlsId);
   if (!Number.isFinite(id)) notFound();
 
@@ -104,7 +121,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
       <ListingGallery photos={listing.photos ?? []} address={listing.address_full} />
 
       {/* Hero strip — price + address + bed/bath/sqft + ListingActionRow (self-contained per plan 02-07) */}
-      <ListingHero listing={listing} />
+      <ListingHero listing={listing} leadSource={leadSource} />
 
       {/* === D-12 content order begins === */}
 
@@ -167,6 +184,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
         communityName={(listing.raw_data as Record<string, unknown> | null)?.communityName as string | null}
         floorPlanName={(listing.raw_data as Record<string, unknown> | null)?.planName as string | null}
         listingAddress={listing.address_full}
+        leadSource={leadSource}
       />
     </main>
   );

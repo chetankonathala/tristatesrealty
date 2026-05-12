@@ -1,12 +1,13 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useQueryStates } from "nuqs";
-import { SendHorizonal, Sparkles, RotateCcw } from "lucide-react";
+import { SendHorizonal, Sparkles, RotateCcw, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { searchParamParsers } from "@/lib/schemas/nuqs-parsers";
+import { ContactAgentModal } from "@/components/listings/contact-agent-modal";
 
 type SearchInput = {
   minPrice?: number;
@@ -45,6 +46,7 @@ export function ChatPanel({ onFiltersApplied, compact }: ChatPanelProps) {
     shallow: false,
   });
   const [input, setInput] = useState("");
+  const [contactOpen, setContactOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -131,6 +133,28 @@ export function ChatPanel({ onFiltersApplied, compact }: ChatPanelProps) {
   };
 
   const isEmpty = messages.length === 0;
+
+  // Show "Talk to an agent" CTA once the assistant has produced at least one
+  // search-applied response (Phase 7 LEAD-02: ai_chat source).
+  const hasSearched = useMemo(
+    () =>
+      messages.some(
+        (m) =>
+          m.role === "assistant" &&
+          m.parts.some(
+            (p) => p.type === "tool-searchListings" && p.state === "output-available"
+          )
+      ),
+    [messages]
+  );
+
+  const conversationSummary = useMemo(() => {
+    const userMsgs = messages
+      .filter((m) => m.role === "user")
+      .flatMap((m) => m.parts.filter((p) => p.type === "text").map((p) => (p as { text: string }).text));
+    if (userMsgs.length === 0) return undefined;
+    return `From AI chat search:\n— ${userMsgs.join("\n— ")}`.slice(0, 1800);
+  }, [messages]);
 
   return (
     <div className={cn("flex flex-col h-full bg-background", compact && "text-sm")}>
@@ -221,8 +245,30 @@ export function ChatPanel({ onFiltersApplied, compact }: ChatPanelProps) {
           </div>
         )}
 
+        {hasSearched && !isLoading && (
+          <div className="flex justify-start">
+            <button
+              type="button"
+              onClick={() => setContactOpen(true)}
+              className="inline-flex items-center gap-2 text-xs font-semibold rounded-full border border-accent/40 bg-accent/10 text-accent px-3 py-1.5 hover:bg-accent/20 transition-colors"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              Talk to an agent about these results
+            </button>
+          </div>
+        )}
+
         <div ref={bottomRef} />
       </div>
+
+      {/* ai_chat source — opens shared lead modal in controlled mode */}
+      <ContactAgentModal
+        hideTrigger
+        source="ai_chat"
+        open={contactOpen}
+        onOpenChange={setContactOpen}
+        prefillMessage={conversationSummary}
+      />
 
       {/* Input */}
       <form

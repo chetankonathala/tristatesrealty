@@ -12,6 +12,8 @@ interface ListingCardProps {
   onSave?: (mlsId: number) => void;
   onRequireSignIn?: () => void;
   highlighted?: boolean;
+  /** Lead source tag forwarded to the detail page via ?from= (Phase 7 LEAD-02) */
+  source?: "filter_search" | "map_click";
 }
 
 export function ListingCard({
@@ -21,7 +23,9 @@ export function ListingCard({
   onSave,
   onRequireSignIn,
   highlighted = false,
+  source,
 }: ListingCardProps) {
+  const href = source ? `/listings/${listing.mls_id}?from=${source}` : `/listings/${listing.mls_id}`;
   const photo = listing.photos?.[0];
   const photoCount = listing.photos?.length ?? 0;
   const isNew = listing.list_date
@@ -49,7 +53,7 @@ export function ListingCard({
 
   return (
     <Link
-      href={`/listings/${listing.mls_id}`}
+      href={href}
       className={cn(
         "group relative block overflow-hidden rounded-lg border bg-card transition-colors",
         highlighted ? "border-accent" : "border-border hover:border-accent/60"

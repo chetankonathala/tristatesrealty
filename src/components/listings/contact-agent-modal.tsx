@@ -10,6 +10,7 @@ import { MessageCircle, Loader2 } from "lucide-react";
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalDescription } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { LeadSource } from "@/types/lead";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -21,14 +22,21 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 interface ContactAgentModalProps {
-  mlsId: number;
+  /** Optional — omit for general inquiries (e.g. from the AI chat) */
+  mlsId?: number;
   communityName?: string | null;
   floorPlanName?: string | null;
   listingAddress?: string | null;
+  /** Lead-source tag (Phase 7 LEAD-02). Defaults to "direct". */
+  source?: LeadSource;
+  /** Optional message to pre-populate the message field (e.g. AI chat context) */
+  prefillMessage?: string;
   triggerLabel?: string;
   triggerSize?: "default" | "sm" | "lg";
   triggerVariant?: "default" | "outline" | "ghost";
   triggerClassName?: string;
+  /** Hide the built-in trigger button entirely (use parent-controlled open) */
+  hideTrigger?: boolean;
   /** Controlled mode: pass open + onOpenChange to drive from a parent */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -39,10 +47,13 @@ export function ContactAgentModal({
   communityName,
   floorPlanName,
   listingAddress,
+  source = "direct",
+  prefillMessage,
   triggerLabel = "Contact Agent",
   triggerSize = "default",
   triggerVariant = "default",
   triggerClassName,
+  hideTrigger = false,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
 }: ContactAgentModalProps) {
@@ -62,6 +73,7 @@ export function ContactAgentModal({
     defaultValues: {
       name: user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() : "",
       email: user?.emailAddresses?.[0]?.emailAddress ?? "",
+      message: prefillMessage ?? "",
     },
   });
 
@@ -73,8 +85,9 @@ export function ContactAgentModal({
       community_name: communityName ?? undefined,
       floor_plan_name: floorPlanName ?? undefined,
       listing_address: listingAddress ?? undefined,
-      listing_url: `${siteUrl}/listings/${mlsId}`,
+      listing_url: mlsId ? `${siteUrl}/listings/${mlsId}` : undefined,
       user_id: user?.id ?? undefined,
+      source,
     };
 
     try {
@@ -105,10 +118,12 @@ export function ContactAgentModal({
 
   return (
     <>
-      <Button variant={triggerVariant} size={triggerSize} className={triggerClassName} onClick={() => setOpen(true)}>
-        <MessageCircle className="h-4 w-4 mr-2" />
-        {triggerLabel}
-      </Button>
+      {!hideTrigger && (
+        <Button variant={triggerVariant} size={triggerSize} className={triggerClassName} onClick={() => setOpen(true)}>
+          <MessageCircle className="h-4 w-4 mr-2" />
+          {triggerLabel}
+        </Button>
+      )}
       <Modal open={open} onOpenChange={handleOpenChange}>
 
       <ModalContent>

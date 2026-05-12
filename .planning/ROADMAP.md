@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 Foundation** — Phases 1-3 (shipped 2026-04-18)
-- 🚧 **v1.1 Delaware Search Platform** — Phases 4-7 (in progress)
+- ✅ **v1.1 Delaware Search Platform** — Phases 4-7 (shipped 2026-04-30)
 - 📋 **v1.2 Buyer Accounts & Alerts** — Phases 8+ (planned)
 
 ## Phases
@@ -152,9 +152,9 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 07-01: Lead submission API + Resend email + Twilio SMS routing
-- [ ] 07-02: Lead source tagging system + Supabase leads table
-- [ ] 07-03: /agent/dashboard page — lead list with listing context
+- [x] 07-01: Env hard-fail validator (zod) + lead-smoke test endpoint
+- [x] 07-02: Lead source tagging — migration, types, API, all 6 surfaces
+- [x] 07-03: Agent layout shell + dashboard polish (price, source badges, filters)
 
 ## Progress
 
@@ -166,4 +166,4 @@ Plans:
 | 4. MLS Data Pipeline | v1.1 | 3/3 | Complete   | 2026-04-20 |
 | 5. Structured Search | v1.1 | 4/4 | Complete | 2026-04-27 |
 | 6. AI Chat Search | v1.1 | 5/5 | Complete | 2026-04-30 |
-| 7. Lead Routing & Agent Dashboard | v1.1 | 0/3 | Not started | - |
+| 7. Lead Routing & Agent Dashboard | v1.1 | 3/3 | Complete | 2026-04-30 |

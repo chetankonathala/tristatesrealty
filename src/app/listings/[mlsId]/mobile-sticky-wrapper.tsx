@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MobileDetailStickyBar } from "@/components/listings/mobile-detail-sticky-bar";
 import { ContactAgentModal } from "@/components/listings/contact-agent-modal";
+import type { LeadSource } from "@/types/lead";
 
 interface MobileDetailStickyBarWrapperProps {
   price: number;
@@ -11,6 +12,7 @@ interface MobileDetailStickyBarWrapperProps {
   communityName?: string | null;
   floorPlanName?: string | null;
   listingAddress?: string | null;
+  leadSource?: LeadSource;
 }
 
 export function MobileDetailStickyBarWrapper({
@@ -20,6 +22,7 @@ export function MobileDetailStickyBarWrapper({
   communityName,
   floorPlanName,
   listingAddress,
+  leadSource = "direct",
 }: MobileDetailStickyBarWrapperProps) {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -36,7 +39,8 @@ export function MobileDetailStickyBarWrapper({
         communityName={communityName}
         floorPlanName={floorPlanName}
         listingAddress={listingAddress}
-        triggerClassName="hidden"
+        source={leadSource}
+        hideTrigger
         open={modalOpen}
         onOpenChange={setModalOpen}
       />

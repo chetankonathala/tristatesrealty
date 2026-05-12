@@ -88,6 +88,7 @@ export function ScheduleTourModal({
       community_name: communityName,
       listing_url: `${siteUrl}/communities/${communitySlug}`,
       user_id: user?.id ?? undefined,
+      source: "community_page" as const,
     };
 
     try {

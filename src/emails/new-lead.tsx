@@ -15,8 +15,33 @@ import {
 import type { Lead } from "@/types/lead";
 
 interface NewLeadEmailProps {
-  lead: Pick<Lead, "name" | "email" | "phone" | "message" | "community_name" | "floor_plan_name" | "listing_address" | "listing_url">;
+  lead: Pick<
+    Lead,
+    | "name"
+    | "email"
+    | "phone"
+    | "message"
+    | "community_name"
+    | "floor_plan_name"
+    | "listing_address"
+    | "listing_url"
+    | "source"
+    | "list_price"
+  >;
   dashboardUrl: string;
+}
+
+const SOURCE_LABEL: Record<string, string> = {
+  ai_chat: "AI Chat",
+  map_click: "Map",
+  filter_search: "Search Filters",
+  community_page: "Community Page",
+  direct: "Direct",
+};
+
+function formatPrice(p: number | null | undefined): string | null {
+  if (p == null) return null;
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(p);
 }
 
 const colors = {
@@ -84,6 +109,11 @@ export function NewLeadEmail({ lead, dashboardUrl }: NewLeadEmailProps) {
             <Text style={{ color: colors.muted, fontSize: 13, margin: "4px 0 0" }}>
               A potential buyer has submitted a contact form on your website.
             </Text>
+            {lead.source && (
+              <Text style={{ color: colors.green, fontSize: 12, margin: "8px 0 0", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                Source: {SOURCE_LABEL[lead.source] ?? lead.source}
+              </Text>
+            )}
           </Section>
 
           {/* Buyer info */}
@@ -186,6 +216,17 @@ export function NewLeadEmail({ lead, dashboardUrl }: NewLeadEmailProps) {
                   </Column>
                   <Column>
                     <Text style={{ color: colors.text, fontSize: 14, margin: 0 }}>{lead.listing_address}</Text>
+                  </Column>
+                </Row>
+              )}
+
+              {lead.list_price != null && (
+                <Row style={{ marginBottom: 10 }}>
+                  <Column style={{ width: "35%" }}>
+                    <Text style={{ color: colors.muted, fontSize: 12, margin: 0 }}>List Price</Text>
+                  </Column>
+                  <Column>
+                    <Text style={{ color: colors.accent, fontSize: 14, fontWeight: 700, margin: 0 }}>{formatPrice(lead.list_price)}</Text>
                   </Column>
                 </Row>
               )}

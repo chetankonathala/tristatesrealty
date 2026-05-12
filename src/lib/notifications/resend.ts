@@ -3,11 +3,12 @@ import { ListingAlertEmail } from "@/emails/listing-alert";
 import { NewLeadEmail } from "@/emails/new-lead";
 import type { ListingSummary } from "@/types/listing";
 import type { Lead } from "@/types/lead";
+import { env } from "@/lib/env";
 
-function getClient() {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error("RESEND_API_KEY missing");
-  return new Resend(key);
+let cached: Resend | null = null;
+function getClient(): Resend {
+  if (!cached) cached = new Resend(env.RESEND_API_KEY);
+  return cached;
 }
 
 export async function sendListingAlert(opts: {
@@ -17,15 +18,14 @@ export async function sendListingAlert(opts: {
   listings: ListingSummary[];
 }): Promise<{ id: string | null }> {
   const resend = getClient();
-  const from = process.env.RESEND_FROM_EMAIL ?? "alerts@tristatesrealty.com";
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tristatesrealty.com";
+  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
   const subject =
     opts.listings.length === 1
       ? `A new home matches '${opts.searchName}'`
       : `${opts.listings.length} new homes match '${opts.searchName}'`;
 
   const result = await resend.emails.send({
-    from,
+    from: env.RESEND_FROM_EMAIL,
     to: opts.to,
     subject,
     react: ListingAlertEmail({
@@ -40,27 +40,28 @@ export async function sendListingAlert(opts: {
   return { id: result.data?.id ?? null };
 }
 
-export async function sendNewLeadAlert(lead: Pick<Lead, "name" | "email" | "phone" | "message" | "community_name" | "floor_plan_name" | "listing_address" | "listing_url">): Promise<{ id: string | null }> {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) {
-    console.warn("[resend] RESEND_API_KEY not set — skipping lead notification email");
-    return { id: null };
-  }
-
+export async function sendNewLeadAlert(
+  lead: Pick<
+    Lead,
+    | "name"
+    | "email"
+    | "phone"
+    | "message"
+    | "community_name"
+    | "floor_plan_name"
+    | "listing_address"
+    | "listing_url"
+    | "source"
+    | "list_price"
+  >
+): Promise<{ id: string | null }> {
   const resend = getClient();
-  const agentEmail = process.env.AGENT_EMAIL;
-  if (!agentEmail) {
-    console.warn("[resend] AGENT_EMAIL not set — skipping lead notification email");
-    return { id: null };
-  }
-
-  const from = process.env.RESEND_FROM_EMAIL ?? "leads@tristatesrealty.com";
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tristatesrealty.vercel.app";
+  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
   const dashboardUrl = `${baseUrl}/agent/dashboard`;
 
   const result = await resend.emails.send({
-    from,
-    to: agentEmail,
+    from: env.RESEND_FROM_EMAIL,
+    to: env.AGENT_EMAIL,
     subject: `New buyer inquiry from ${lead.name}${lead.community_name ? ` — ${lead.community_name}` : ""}`,
     react: NewLeadEmail({ lead, dashboardUrl }),
   });

@@ -5,5 +5,5 @@
     "commit_docs": false,
     "_auto_chain_active": false
   },
-  "model_profile": "quality"
+  "model_profile": "balanced"
 }

@@ -1,12 +1,14 @@
 import type { Listing } from "@/types/listing";
+import type { LeadSource } from "@/types/lead";
 import { ListingActionRow } from "./listing-action-row";
 import { Bed, Bath, Square, Building2 } from "lucide-react";
 
 interface ListingHeroProps {
   listing: Listing;
+  leadSource?: LeadSource;
 }
 
-export function ListingHero({ listing }: ListingHeroProps) {
+export function ListingHero({ listing, leadSource = "direct" }: ListingHeroProps) {
   const raw = listing.raw_data as Record<string, unknown> | null;
   const communityName = raw?.communityName as string | null | undefined;
   const floorPlanName = raw?.planName as string | null | undefined;
@@ -61,6 +63,7 @@ export function ListingHero({ listing }: ListingHeroProps) {
             floorPlanName={floorPlanName}
             listingAddress={listing.address_full}
             communityUrl={communityUrl}
+            source={leadSource}
           />
           {listing.listing_agent_name && (
             <div className="pt-4 border-t border-border text-xs text-muted-foreground">

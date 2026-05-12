@@ -5,6 +5,7 @@ import { Heart, Share2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ContactAgentModal } from "./contact-agent-modal";
+import type { LeadSource } from "@/types/lead";
 
 interface ListingActionRowProps {
   mlsId: number;
@@ -12,6 +13,7 @@ interface ListingActionRowProps {
   floorPlanName?: string | null;
   listingAddress?: string | null;
   communityUrl?: string | null;
+  source?: LeadSource;
 }
 
 export function ListingActionRow({
@@ -20,6 +22,7 @@ export function ListingActionRow({
   floorPlanName,
   listingAddress,
   communityUrl,
+  source = "direct",
 }: ListingActionRowProps) {
   const { isSignedIn, isLoaded } = useUser();
   const [isSaved, setIsSaved] = useState(false);
@@ -101,6 +104,7 @@ export function ListingActionRow({
         communityName={communityName}
         floorPlanName={floorPlanName}
         listingAddress={listingAddress}
+        source={source}
       />
     </div>
   );
